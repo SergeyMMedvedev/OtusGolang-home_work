@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"golang.org/x/example/hello/reverse"
+	"github.com/ozgio/strutil"
 )
 
 func main() {
-	fmt.Println(reverse.String("Hello, OTUS!"))
+	fmt.Println(strutil.Reverse("Hello, OTUS!"))
 }
