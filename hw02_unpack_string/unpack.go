@@ -27,18 +27,18 @@ func Unpack(str string) (string, error) {
 			if esc {
 				esc = false
 			}
+		case buf == "":
+			return "", ErrInvalidString
 		default:
-			if buf == "" {
-				return "", ErrInvalidString
-			} else {
-				res.Write([]byte(strings.Repeat(buf, digit)))
-				buf = ""
-			}
+			res.Write([]byte(strings.Repeat(buf, digit)))
+			buf = ""
 		}
 	}
 	if esc {
 		return "", ErrInvalidString
 	}
+
 	res.Write([]byte(buf))
+
 	return res.String(), nil
 }
