@@ -10,24 +10,24 @@ import (
 var ErrInvalidString = errors.New("invalid string")
 
 func Unpack(str string) (string, error) {
-
 	var buf string
 	var esc bool
 	res := strings.Builder{}
 	for _, b := range str {
 		letter := fmt.Sprintf("%c", b)
 		digit, err := strconv.Atoi(letter)
-		if letter == `\` && !esc {
+		switch {
+		case letter == `\` && !esc:
 			esc = true
-		} else if err != nil && letter != `\` && esc {
+		case err != nil && letter != `\` && esc:
 			return "", ErrInvalidString
-		} else if err != nil || esc {
+		case err != nil || esc:
 			res.Write([]byte(buf))
 			buf = letter
 			if esc {
 				esc = false
 			}
-		} else {
+		default:
 			if buf == "" {
 				return "", ErrInvalidString
 			} else {
