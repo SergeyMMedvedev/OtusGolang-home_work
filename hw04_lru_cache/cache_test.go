@@ -49,8 +49,57 @@ func TestCache(t *testing.T) {
 		require.Nil(t, val)
 	})
 
+	type testCase struct {
+		key   Key
+		value int
+	}
+	testCases := []testCase{{"aaa", 100}, {"bbb", 200}, {"ccc", 300}}
+
 	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+		c := NewCache(5)
+		for _, tCase := range testCases {
+			c.Set(tCase.key, tCase.value)
+		}
+		c.Clear()
+		for _, tCase := range testCases {
+			val, ok := c.Get(tCase.key)
+			require.False(t, ok)
+			require.Nil(t, val)
+		}
+	})
+
+	t.Run("capacity logic", func(t *testing.T) {
+		c := NewCache(3)
+		for _, tCase := range testCases {
+			c.Set(tCase.key, tCase.value)
+		}
+
+		c.Set("ddd", 400)
+		val, ok := c.Get("aaa")
+		require.False(t, ok)
+		require.Nil(t, val)
+
+		val, ok = c.Get("ddd")
+		require.True(t, ok)
+		require.Equal(t, 400, val)
+	})
+
+	t.Run("outdate logic", func(t *testing.T) {
+		c := NewCache(3)
+		for _, tCase := range testCases {
+			c.Set(tCase.key, tCase.value)
+		}
+
+		c.Get("aaa")
+		c.Set("bbb", 222)
+		c.Set("ddd", 400)
+		val, ok := c.Get("ccc")
+		require.False(t, ok)
+		require.Nil(t, val)
+
+		val, ok = c.Get("aaa")
+		require.True(t, ok)
+		require.Equal(t, 100, val)
 	})
 }
 
