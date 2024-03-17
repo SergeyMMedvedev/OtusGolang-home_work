@@ -40,6 +40,10 @@ func Run(tasks []Task, n, m int) error {
 	wg.Wait()
 	close(errCh)
 	if len(errCh) >= m {
+		// case, when m == 0
+		if err := <-errCh; err == nil {
+			return nil
+		}
 		return ErrErrorsLimitExceeded
 	}
 
