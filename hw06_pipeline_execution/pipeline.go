@@ -32,7 +32,6 @@ func ExecuteStage(in In, done In, stage Stage) Out {
 }
 
 func ExecutePipeline(in In, done In, stages ...Stage) Out {
-	// Place your code here.
 	for counter := 0; counter < len(stages); counter++ {
 		in = ExecuteStage(in, done, stages[counter])
 	}
