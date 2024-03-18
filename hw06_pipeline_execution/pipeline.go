@@ -28,10 +28,8 @@ func ExecuteStage(in In, done In) Out {
 }
 
 func ExecutePipeline(in In, done In, stages ...Stage) Out {
-	out := in
-	for counter := 0; counter < len(stages); counter++ {
-		stage := stages[counter](out)
-		out = ExecuteStage(stage, done)
+	for _, stage := range stages {
+		in = ExecuteStage(stage(in), done)
 	}
-	return out
+	return in
 }
