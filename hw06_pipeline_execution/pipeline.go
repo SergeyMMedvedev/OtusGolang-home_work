@@ -1,9 +1,5 @@
 package hw06pipelineexecution
 
-import (
-	"fmt"
-)
-
 type (
 	In  = <-chan interface{}
 	Out = In
