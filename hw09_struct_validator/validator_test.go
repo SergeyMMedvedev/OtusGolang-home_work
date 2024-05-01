@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 type UserRole string
@@ -42,18 +44,33 @@ func TestValidate(t *testing.T) {
 		expectedErr error
 	}{
 		{
-			// Place your code here.
+			in:          App{Version: "abc"},
+			expectedErr: nil,
 		},
-		// ...
-		// Place your code here.
+
+		{
+			in: 123,
+			expectedErr: ValidationErrors{ValidationError{
+				Err: ValidationErrorType,
+			}},
+		},
+		{
+			in: App{Version: "abcedf"},
+			expectedErr: ValidationErrors{ValidationError{
+				Field: "Version",
+				Err:   ValidateLenError,
+			}},
+		},
 	}
 
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
 			tt := tt
 			t.Parallel()
-
-			// Place your code here.
+			err := Validate(tt.in)
+			fmt.Println("err", err)
+			fmt.Println("tt.expectedErr", tt.expectedErr)
+			require.Equal(t, tt.expectedErr, err)
 			_ = tt
 		})
 	}
