@@ -275,7 +275,6 @@ func Validate(v interface{}) error {
 		field := objType.Field(fieldIdx)
 
 		fieldValue := reflect.ValueOf(v).Field(fieldIdx)
-		fmt.Println("fieldValue", fieldValue)
 		tags := parseTagString(string(field.Tag))
 		log.Printf("field: %v, value: %v, tags: %v\n", field.Name, fieldValue, tags)
 		for funcName, args := range tags {
