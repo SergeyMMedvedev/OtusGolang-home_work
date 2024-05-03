@@ -14,10 +14,6 @@ type ValidationError struct {
 	Err   error
 }
 
-<<<<<<< HEAD
-var ValidationErrorType = fmt.Errorf("wrong type error")
-var ValidateLenError = fmt.Errorf("wrong length error")
-=======
 var (
 	ErrValidate       = errors.New("wrong type error")
 	ErrValidateLen    = errors.New("wrong length error")
@@ -26,7 +22,6 @@ var (
 	ErrValidateMax    = errors.New("value is more than max")
 	ErrValidateIn     = errors.New("field not in set")
 )
->>>>>>> 4ef8f87dbbc52baf020a477c9eee93366a1938ac
 
 type ValidationErrors []ValidationError
 
