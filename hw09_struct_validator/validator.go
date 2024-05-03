@@ -28,17 +28,11 @@ type ValidationErrors []ValidationError
 func (v ValidationErrors) Error() string {
 	res := strings.Builder{}
 	for _, v := range v {
-<<<<<<< HEAD
-		res.WriteString(v.Field + ": " + v.Err.Error() + "\n")
-=======
 		res.WriteString(fmt.Errorf("%s: %w", v.Field, v.Err).Error() + "\n")
->>>>>>> 4ef8f87dbbc52baf020a477c9eee93366a1938ac
 	}
 	return res.String()
 }
 
-<<<<<<< HEAD
-=======
 func (v ValidationErrors) Unwrap() []error {
 	res := []error{}
 	for _, v := range v {
@@ -47,55 +41,10 @@ func (v ValidationErrors) Unwrap() []error {
 	return res
 }
 
->>>>>>> 4ef8f87dbbc52baf020a477c9eee93366a1938ac
 type (
 	TagsInfo map[string]string
 )
 
-<<<<<<< HEAD
-func parseTagString(tagRaw string) (retInfos TagsInfo) {
-	retInfos = make(TagsInfo)
-	for _, tag := range strings.Split(tagRaw, " ") {
-		if tag = strings.TrimSpace(tag); tag == "" {
-			continue
-		}
-		tagParts := strings.SplitN(tag, ":", 2)
-		if len(tagParts) != 2 {
-			continue
-		}
-
-		tagName := strings.TrimSpace(tagParts[0])
-		// if _, found := retInfos[tagName]; found {
-		// 	continue
-		// }
-		if tagName != "validate" {
-			continue
-		}
-
-		tagValuesRaw, _ := strconv.Unquote(tagParts[1])
-		tagValues := make([]string, 0)
-		for _, value := range strings.Split(tagValuesRaw, "|") {
-			if value := strings.TrimSpace(value); value != "" {
-				tagValues = append(tagValues, value)
-			}
-		}
-		for _, tagValue := range tagValues {
-			valueParts := strings.SplitN(tagValue, ":", 2)
-			if len(tagParts) != 2 {
-				continue
-			}
-			funcName := strings.TrimSpace(valueParts[0])
-			funcArgs := strings.TrimSpace(valueParts[1])
-			retInfos[funcName] = funcArgs
-		}
-	}
-	return
-}
-
-func ValidateLen(fieldName string, fieldValueRaw reflect.Value, args string) ValidationError {
-	result := ValidationError{
-		Field: fieldName,
-=======
 func parseTagString(tag string) (retInfos TagsInfo) {
 	retInfos = make(TagsInfo)
 	tagValues := make([]string, 0)
@@ -116,16 +65,11 @@ func parseTagString(tag string) (retInfos TagsInfo) {
 func ValidateLen(field reflect.StructField, fieldValueRaw reflect.Value, args string) ValidationError {
 	result := ValidationError{
 		Field: field.Name,
->>>>>>> 4ef8f87dbbc52baf020a477c9eee93366a1938ac
 		Err:   nil,
 	}
 	fieldValue, ok := fieldValueRaw.Interface().(string)
 	if !ok {
-<<<<<<< HEAD
-		result.Err = fmt.Errorf("invalid field value type")
-=======
 		result.Err = ErrValidate
->>>>>>> 4ef8f87dbbc52baf020a477c9eee93366a1938ac
 		return result
 	}
 	length, err := strconv.Atoi(args)
@@ -133,10 +77,6 @@ func ValidateLen(field reflect.StructField, fieldValueRaw reflect.Value, args st
 		result.Err = fmt.Errorf("invalid value for len validation: %w", err)
 		return result
 	}
-<<<<<<< HEAD
-	if len(fieldValue) > length {
-		result.Err = ValidateLenError
-=======
 	if len(fieldValue) != length {
 		result.Err = ErrValidateLen
 	}
@@ -162,25 +102,10 @@ func ValidateRegexp(field reflect.StructField, fieldValueRaw reflect.Value, reSt
 	if !re.MatchString(fieldValue) {
 		result.Err = ErrValidateRegexp
 		return result
->>>>>>> 4ef8f87dbbc52baf020a477c9eee93366a1938ac
 	}
 	return result
 }
 
-<<<<<<< HEAD
-var validationMap = map[string]func(fieldName string, fieldValue reflect.Value, args string) ValidationError{
-	"len": ValidateLen,
-}
-
-func validationExec(fieldName string, fieldValue reflect.Value, funcName string, args string) ValidationError {
-	valFunc := validationMap[funcName]
-	return valFunc(fieldName, fieldValue, args)
-}
-
-func Validate(v interface{}) error {
-	// Place your code here.
-	var results = make(ValidationErrors, 0)
-=======
 var validationMap = map[string]func(field reflect.StructField, fieldValue reflect.Value, args string) ValidationError{
 	"len":    ValidateLen,
 	"regexp": ValidateRegexp,
@@ -256,7 +181,6 @@ func validationExec(field reflect.StructField, fieldValue reflect.Value, funcNam
 
 func Validate(v interface{}) error {
 	results := make(ValidationErrors, 0)
->>>>>>> 4ef8f87dbbc52baf020a477c9eee93366a1938ac
 
 	var objType reflect.Type
 	if t, ok := v.(reflect.Type); ok {
@@ -270,27 +194,11 @@ func Validate(v interface{}) error {
 	}
 
 	if objType.Kind() != reflect.Struct {
-<<<<<<< HEAD
-		return ValidationErrors{ValidationError{Err: ValidationErrorType}}
-=======
 		return ValidationErrors{ValidationError{Err: ErrValidate}}
->>>>>>> 4ef8f87dbbc52baf020a477c9eee93366a1938ac
 	}
 
 	for fieldIdx := 0; fieldIdx < objType.NumField(); fieldIdx++ {
 		field := objType.Field(fieldIdx)
-<<<<<<< HEAD
-
-		fieldValue := reflect.ValueOf(v).Field(fieldIdx)
-		fmt.Println("fieldValue", fieldValue)
-		tags := parseTagString(string(field.Tag))
-		log.Printf("field: %v, value: %v, tags: %v\n", field.Name, fieldValue, tags)
-		for funcName, args := range tags {
-			valErr := validationExec(field.Name, fieldValue, funcName, args)
-			log.Printf("validation result: %v\n", valErr)
-			if valErr.Err != nil {
-				results = append(results, valErr)
-=======
 		fieldValue := reflect.ValueOf(v).Field(fieldIdx)
 		validateTag, ok := field.Tag.Lookup("validate")
 		if !ok {
@@ -314,7 +222,6 @@ func Validate(v interface{}) error {
 				if valErr.Err != nil {
 					results = append(results, valErr)
 				}
->>>>>>> 4ef8f87dbbc52baf020a477c9eee93366a1938ac
 			}
 		}
 	}

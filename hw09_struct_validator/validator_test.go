@@ -597,12 +597,6 @@ func TestValidateRegexpLen(t *testing.T) {
 			tt := tt
 			t.Parallel()
 			err := Validate(tt.in)
-<<<<<<< HEAD
-			fmt.Println("err", err)
-			fmt.Println("tt.expectedErr", tt.expectedErr)
-			require.Equal(t, tt.expectedErr, err)
-			_ = tt
-=======
 			require.NoError(t, err)
 		})
 	}
@@ -631,7 +625,6 @@ func TestValidateRegexpLenNegative(t *testing.T) {
 			for _, e := range tt.expectedErrs {
 				require.ErrorIs(t, err, e)
 			}
->>>>>>> 4ef8f87dbbc52baf020a477c9eee93366a1938ac
 		})
 	}
 }
