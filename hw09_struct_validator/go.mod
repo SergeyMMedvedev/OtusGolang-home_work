@@ -1,6 +1,6 @@
 module github.com/SergeyMMedvedev/OtusGolang-home_work/hw09_struct_validator
 
-go 1.22.1
+go 1.22
 
 require github.com/stretchr/testify v1.9.0
 
