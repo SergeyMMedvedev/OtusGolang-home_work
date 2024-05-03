@@ -3,7 +3,6 @@ package hw09structvalidator
 import (
 	"errors"
 	"fmt"
-	"log"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -16,12 +15,12 @@ type ValidationError struct {
 }
 
 var (
-	ErrValidate       = fmt.Errorf("wrong type error")
-	ErrValidateLen    = fmt.Errorf("wrong length error")
-	ErrValidateRegexp = fmt.Errorf("string does not match regexp")
-	ErrValidateMin    = fmt.Errorf("value is less than min")
-	ErrValidateMax    = fmt.Errorf("value is more than max")
-	ErrValidateIn     = fmt.Errorf("field not in set")
+	ErrValidate       = errors.New("wrong type error")
+	ErrValidateLen    = errors.New("wrong length error")
+	ErrValidateRegexp = errors.New("string does not match regexp")
+	ErrValidateMin    = errors.New("value is less than min")
+	ErrValidateMax    = errors.New("value is more than max")
+	ErrValidateIn     = errors.New("field not in set")
 )
 
 type ValidationErrors []ValidationError
@@ -34,44 +33,33 @@ func (v ValidationErrors) Error() string {
 	return res.String()
 }
 
+func (v ValidationErrors) Unwrap() []error {
+	res := []error{}
+	for _, v := range v {
+		res = append(res, v.Err)
+	}
+	return res
+}
+
 type (
 	TagsInfo map[string]string
 )
 
-func parseTagString(tagRaw string) (retInfos TagsInfo) {
+func parseTagString(tag string) (retInfos TagsInfo) {
 	retInfos = make(TagsInfo)
-	for _, tag := range strings.Split(tagRaw, " ") {
-		if tag = strings.TrimSpace(tag); tag == "" {
-			continue
-		}
-		tagParts := strings.SplitN(tag, ":", 2)
-		if len(tagParts) != 2 {
-			continue
-		}
-
-		tagName := strings.TrimSpace(tagParts[0])
-		if tagName != "validate" {
-			continue
-		}
-
-		tagValuesRaw, _ := strconv.Unquote(tagParts[1])
-		tagValues := make([]string, 0)
-		for _, value := range strings.Split(tagValuesRaw, "|") {
-			if value := strings.TrimSpace(value); value != "" {
-				tagValues = append(tagValues, value)
-			}
-		}
-		for _, tagValue := range tagValues {
-			valueParts := strings.SplitN(tagValue, ":", 2)
-			if len(tagParts) != 2 {
-				continue
-			}
-			funcName := strings.TrimSpace(valueParts[0])
-			funcArgs := strings.TrimSpace(valueParts[1])
-			retInfos[funcName] = funcArgs
+	tagValues := make([]string, 0)
+	for _, value := range strings.Split(tag, "|") {
+		if value := strings.TrimSpace(value); value != "" {
+			tagValues = append(tagValues, value)
 		}
 	}
-	return
+	for _, tagValue := range tagValues {
+		valueParts := strings.SplitN(tagValue, ":", 2)
+		funcName := strings.TrimSpace(valueParts[0])
+		funcArgs := strings.TrimSpace(valueParts[1])
+		retInfos[funcName] = funcArgs
+	}
+	return retInfos
 }
 
 func ValidateLen(field reflect.StructField, fieldValueRaw reflect.Value, args string) ValidationError {
@@ -192,7 +180,6 @@ func validationExec(field reflect.StructField, fieldValue reflect.Value, funcNam
 }
 
 func Validate(v interface{}) error {
-	// Place your code here.
 	results := make(ValidationErrors, 0)
 
 	var objType reflect.Type
@@ -213,8 +200,11 @@ func Validate(v interface{}) error {
 	for fieldIdx := 0; fieldIdx < objType.NumField(); fieldIdx++ {
 		field := objType.Field(fieldIdx)
 		fieldValue := reflect.ValueOf(v).Field(fieldIdx)
-		tags := parseTagString(string(field.Tag))
-		log.Printf("field: %v, value: %v, tags: %v\n", field.Name, fieldValue, tags)
+		validateTag, ok := field.Tag.Lookup("validate")
+		if !ok {
+			continue
+		}
+		tags := parseTagString(validateTag)
 		for funcName, args := range tags {
 			if fieldValue.Kind() == reflect.Slice {
 				for i := 0; i < fieldValue.Len(); i++ {

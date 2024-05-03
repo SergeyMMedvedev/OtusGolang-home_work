@@ -78,15 +78,26 @@ func TestValidate(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
-		// failed validation
+	}
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
+			tt := tt
+			t.Parallel()
+			err := Validate(tt.in)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestValidateNegative(t *testing.T) {
+	tests := []struct {
+		in           interface{}
+		expectedErrs []error
+	}{
 		{
-			in: App{Version: "aaaaaa"},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Version",
-					Err:   ErrValidateLen,
-				},
-			},
+			in:           App{Version: "aaaaaa"},
+			expectedErrs: []error{ErrValidateLen},
 		},
 		{
 			in: User{
@@ -97,27 +108,12 @@ func TestValidate(t *testing.T) {
 				Role:   "stufff",
 				Phones: []string{"123"},
 			},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "ID",
-					Err:   ErrValidateLen,
-				},
-				ValidationError{
-					Field: "Age",
-					Err:   ErrValidateMin,
-				},
-				ValidationError{
-					Field: "Email",
-					Err:   ErrValidateRegexp,
-				},
-				ValidationError{
-					Field: "Role",
-					Err:   ErrValidateIn,
-				},
-				ValidationError{
-					Field: "Phones",
-					Err:   ErrValidateLen,
-				},
+			expectedErrs: []error{
+				ErrValidateLen,
+				ErrValidateMin,
+				ErrValidateRegexp,
+				ErrValidateIn,
+				ErrValidateLen,
 			},
 		},
 	}
@@ -127,12 +123,9 @@ func TestValidate(t *testing.T) {
 			tt := tt
 			t.Parallel()
 			err := Validate(tt.in)
-			if tt.expectedErr == nil {
-				require.NoError(t, err)
-			} else {
-				require.EqualError(t, err, tt.expectedErr.Error())
+			for _, e := range tt.expectedErrs {
+				require.ErrorIs(t, err, e)
 			}
-			_ = tt
 		})
 	}
 }
@@ -150,35 +143,36 @@ func TestValidateLen(t *testing.T) {
 			in:          App{Version: "aaaaa"},
 			expectedErr: nil,
 		},
-		// failed validation
+	}
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
+			tt := tt
+			t.Parallel()
+			err := Validate(tt.in)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestValidateLenNegative(t *testing.T) {
+	tests := []struct {
+		in          interface{}
+		expectedErr error
+	}{
 		{
-			in: App{Version: "aaaaaa"},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Version",
-					Err:   ErrValidateLen,
-				},
-			},
+			in:          App{Version: "aaaaaa"},
+			expectedErr: ErrValidateLen,
 		},
 		{
-			in: AppArr{Version: []string{"aaaaa", "bbbbbb"}},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Version",
-					Err:   ErrValidateLen,
-				},
-			},
+			in:          AppArr{Version: []string{"aaaaa", "bbbbbb"}},
+			expectedErr: ErrValidateLen,
 		},
 		{
 			in: struct {
 				Version []int `validate:"len:5"`
 			}{Version: []int{123, 123}},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Version",
-					Err:   ErrValidate,
-				},
-			},
+			expectedErr: ErrValidate,
 		},
 	}
 
@@ -187,12 +181,7 @@ func TestValidateLen(t *testing.T) {
 			tt := tt
 			t.Parallel()
 			err := Validate(tt.in)
-			if tt.expectedErr == nil {
-				require.NoError(t, err)
-			} else {
-				require.EqualError(t, err, tt.expectedErr.Error())
-			}
-			_ = tt
+			require.ErrorIs(t, err, tt.expectedErr)
 		})
 	}
 }
@@ -212,45 +201,42 @@ func TestValidateRegexp(t *testing.T) {
 			}{Emails: []string{"asd@asd.com", "bsd@bsd.com"}},
 			expectedErr: nil,
 		},
+	}
 
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
+			tt := tt
+			t.Parallel()
+			err := Validate(tt.in)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestValidateRegexpNegative(t *testing.T) {
+	tests := []struct {
+		in          interface{}
+		expectedErr error
+	}{
 		// failed validation
 		{
-			in: EmailStruct{Email: "asd@asd"},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Email",
-					Err:   ErrValidateRegexp,
-				},
-			},
+			in:          EmailStruct{Email: "asd@asd"},
+			expectedErr: ErrValidateRegexp,
 		},
 		{
-			in: EmailStruct{Email: ""},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Email",
-					Err:   ErrValidateRegexp,
-				},
-			},
+			in:          EmailStruct{Email: ""},
+			expectedErr: ErrValidateRegexp,
 		},
 		{
 			in: struct {
 				Emails []string `validate:"regexp:^\\w+@\\w+\\.\\w+$"`
 			}{Emails: []string{"asd@asd.com", "bsd@bsd"}},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Emails",
-					Err:   ErrValidateRegexp,
-				},
-			},
+			expectedErr: ErrValidateRegexp,
 		},
 		// wrong type
 		{
-			in: 123,
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Err: ErrValidate,
-				},
-			},
+			in:          123,
+			expectedErr: ErrValidate,
 		},
 		{
 			in: struct {
@@ -258,10 +244,7 @@ func TestValidateRegexp(t *testing.T) {
 			}{
 				Email: 123,
 			},
-			expectedErr: ValidationErrors{ValidationError{
-				Field: "Email",
-				Err:   ErrValidate,
-			}},
+			expectedErr: ErrValidate,
 		},
 		{
 			in: struct {
@@ -269,10 +252,7 @@ func TestValidateRegexp(t *testing.T) {
 			}{
 				Emails: []int{123},
 			},
-			expectedErr: ValidationErrors{ValidationError{
-				Field: "Emails",
-				Err:   ErrValidate,
-			}},
+			expectedErr: ErrValidate,
 		},
 	}
 
@@ -281,12 +261,7 @@ func TestValidateRegexp(t *testing.T) {
 			tt := tt
 			t.Parallel()
 			err := Validate(tt.in)
-			if tt.expectedErr == nil {
-				require.NoError(t, err)
-			} else {
-				require.EqualError(t, err, tt.expectedErr.Error())
-			}
-			_ = tt
+			require.ErrorIs(t, err, tt.expectedErr)
 		})
 	}
 }
@@ -324,47 +299,6 @@ func TestValidateIn(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
-		// failed validation
-		{
-			in: RoleStruct{
-				Role: "super admin",
-			},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Role",
-					Err:   ErrValidateIn,
-				},
-			},
-		},
-		{
-			in: Response{
-				Code: 201,
-			},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Code",
-					Err:   ErrValidateIn,
-				},
-			},
-		},
-		{
-			in: struct {
-				Codes []int `validate:"in:200,404,500"`
-			}{
-				Codes: []int{201, 404},
-			},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Codes",
-					Err:   ErrValidateIn,
-				},
-			},
-		},
-		// wrong type
-		{
-			in:          123,
-			expectedErr: ValidationErrors{ValidationError{Err: ErrValidate}},
-		},
 	}
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
@@ -376,7 +310,48 @@ func TestValidateIn(t *testing.T) {
 			} else {
 				require.EqualError(t, err, tt.expectedErr.Error())
 			}
-			_ = tt
+		})
+	}
+}
+
+func TestValidateInNegative(t *testing.T) {
+	tests := []struct {
+		in          interface{}
+		expectedErr error
+	}{
+		// failed validation
+		{
+			in: RoleStruct{
+				Role: "super admin",
+			},
+			expectedErr: ErrValidateIn,
+		},
+		{
+			in: Response{
+				Code: 201,
+			},
+			expectedErr: ErrValidateIn,
+		},
+		{
+			in: struct {
+				Codes []int `validate:"in:200,404,500"`
+			}{
+				Codes: []int{201, 404},
+			},
+			expectedErr: ErrValidateIn,
+		},
+		// wrong type
+		{
+			in:          123,
+			expectedErr: ErrValidate,
+		},
+	}
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
+			tt := tt
+			t.Parallel()
+			err := Validate(tt.in)
+			require.ErrorIs(t, err, tt.expectedErr)
 		})
 	}
 }
@@ -406,17 +381,28 @@ func TestValidateMin(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
+	}
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
+			tt := tt
+			t.Parallel()
+			err := Validate(tt.in)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestValidateMinNegative(t *testing.T) {
+	tests := []struct {
+		in          interface{}
+		expectedErr error
+	}{
 		// failed validation
 		{
 			in: MinAgeStruct{
 				Age: 17,
 			},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Age",
-					Err:   ErrValidateMin,
-				},
-			},
+			expectedErr: ErrValidateMin,
 		},
 		{
 			in: struct {
@@ -424,17 +410,12 @@ func TestValidateMin(t *testing.T) {
 			}{
 				Ages: []int{17, 20},
 			},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Ages",
-					Err:   ErrValidateMin,
-				},
-			},
+			expectedErr: ErrValidateMin,
 		},
 		// wrong type
 		{
 			in:          123,
-			expectedErr: ValidationErrors{ValidationError{Err: ErrValidate}},
+			expectedErr: ErrValidate,
 		},
 	}
 	for i, tt := range tests {
@@ -442,12 +423,7 @@ func TestValidateMin(t *testing.T) {
 			tt := tt
 			t.Parallel()
 			err := Validate(tt.in)
-			if tt.expectedErr == nil {
-				require.NoError(t, err)
-			} else {
-				require.EqualError(t, err, tt.expectedErr.Error())
-			}
-			_ = tt
+			require.ErrorIs(t, err, tt.expectedErr)
 		})
 	}
 }
@@ -477,17 +453,28 @@ func TestValidateMax(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
+	}
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
+			tt := tt
+			t.Parallel()
+			err := Validate(tt.in)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestValidateMaxNegative(t *testing.T) {
+	tests := []struct {
+		in          interface{}
+		expectedErr error
+	}{
 		// failed validation
 		{
 			in: MaxAgeStruct{
 				Age: 21,
 			},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Age",
-					Err:   ErrValidateMax,
-				},
-			},
+			expectedErr: ErrValidateMax,
 		},
 		{
 			in: struct {
@@ -495,17 +482,12 @@ func TestValidateMax(t *testing.T) {
 			}{
 				Ages: []int{18, 17},
 			},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Ages",
-					Err:   ErrValidateMax,
-				},
-			},
+			expectedErr: ErrValidateMax,
 		},
 		// wrong type
 		{
 			in:          123,
-			expectedErr: ValidationErrors{ValidationError{Err: ErrValidate}},
+			expectedErr: ErrValidate,
 		},
 	}
 	for i, tt := range tests {
@@ -513,12 +495,7 @@ func TestValidateMax(t *testing.T) {
 			tt := tt
 			t.Parallel()
 			err := Validate(tt.in)
-			if tt.expectedErr == nil {
-				require.NoError(t, err)
-			} else {
-				require.EqualError(t, err, tt.expectedErr.Error())
-			}
-			_ = tt
+			require.ErrorIs(t, err, tt.expectedErr)
 		})
 	}
 }
@@ -548,29 +525,34 @@ func TestValidateMinMax(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
+	}
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
+			tt := tt
+			t.Parallel()
+			err := Validate(tt.in)
+			require.NoError(t, err)
+		})
+	}
+}
 
+func TestValidateMinMaxNegative(t *testing.T) {
+	tests := []struct {
+		in          interface{}
+		expectedErr error
+	}{
 		// failed validation
 		{
 			in: AgeStruct{
 				Age: 17,
 			},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Age",
-					Err:   ErrValidateMin,
-				},
-			},
+			expectedErr: ErrValidateMin,
 		},
 		{
 			in: AgeStruct{
 				Age: 21,
 			},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Age",
-					Err:   ErrValidateMax,
-				},
-			},
+			expectedErr: ErrValidateMax,
 		},
 		{
 			in: struct {
@@ -578,17 +560,12 @@ func TestValidateMinMax(t *testing.T) {
 			}{
 				Ages: []int{17, 20},
 			},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Ages",
-					Err:   ErrValidateMin,
-				},
-			},
+			expectedErr: ErrValidateMin,
 		},
 		// // wrong type
 		{
 			in:          123,
-			expectedErr: ValidationErrors{ValidationError{Err: ErrValidate}},
+			expectedErr: ErrValidate,
 		},
 	}
 	for i, tt := range tests {
@@ -596,12 +573,7 @@ func TestValidateMinMax(t *testing.T) {
 			tt := tt
 			t.Parallel()
 			err := Validate(tt.in)
-			if tt.expectedErr == nil {
-				require.NoError(t, err)
-			} else {
-				require.EqualError(t, err, tt.expectedErr.Error())
-			}
-			_ = tt
+			require.ErrorIs(t, err, tt.expectedErr)
 		})
 	}
 }
@@ -619,6 +591,22 @@ func TestValidateRegexpLen(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
+	}
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
+			tt := tt
+			t.Parallel()
+			err := Validate(tt.in)
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestValidateRegexpLenNegative(t *testing.T) {
+	tests := []struct {
+		in           interface{}
+		expectedErrs []error
+	}{
 		// failed validation
 		{
 			in: struct {
@@ -626,16 +614,7 @@ func TestValidateRegexpLen(t *testing.T) {
 			}{
 				Email: "asdasd.com",
 			},
-			expectedErr: ValidationErrors{
-				ValidationError{
-					Field: "Email",
-					Err:   ErrValidateRegexp,
-				},
-				ValidationError{
-					Field: "Email",
-					Err:   ErrValidateLen,
-				},
-			},
+			expectedErrs: []error{ErrValidateRegexp, ErrValidateLen},
 		},
 	}
 	for i, tt := range tests {
@@ -643,12 +622,9 @@ func TestValidateRegexpLen(t *testing.T) {
 			tt := tt
 			t.Parallel()
 			err := Validate(tt.in)
-			if tt.expectedErr == nil {
-				require.NoError(t, err)
-			} else {
-				require.EqualError(t, err, tt.expectedErr.Error())
+			for _, e := range tt.expectedErrs {
+				require.ErrorIs(t, err, e)
 			}
-			_ = tt
 		})
 	}
 }
