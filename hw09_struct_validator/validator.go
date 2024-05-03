@@ -206,7 +206,8 @@ func Validate(v interface{}) error {
 		}
 		tags := parseTagString(validateTag)
 		for funcName, args := range tags {
-			if fieldValue.Kind() == reflect.Slice {
+			switch fieldValue.Kind() {
+			case reflect.Slice:
 				for i := 0; i < fieldValue.Len(); i++ {
 					valErr := validationExec(field, fieldValue.Index(i), funcName, args)
 					if valErr.Err != nil {
@@ -216,7 +217,7 @@ func Validate(v interface{}) error {
 						break
 					}
 				}
-			} else {
+			default:
 				valErr := validationExec(field, fieldValue, funcName, args)
 				if valErr.Err != nil {
 					results = append(results, valErr)
