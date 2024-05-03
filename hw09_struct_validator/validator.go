@@ -28,12 +28,10 @@ type ValidationErrors []ValidationError
 
 func (v ValidationErrors) Error() string {
 	res := strings.Builder{}
-	var err error
 	for _, v := range v {
-		err = fmt.Errorf("%s: %w", v.Field, v.Err)
-		res.WriteString(err.Error())
+		res.WriteString(fmt.Errorf("%s: %w", v.Field, v.Err).Error() + "\n")
 	}
-	return err.Error()
+	return res.String()
 }
 
 type (
@@ -76,59 +74,36 @@ func parseTagString(tagRaw string) (retInfos TagsInfo) {
 	return
 }
 
-func ValidateLen(fieldName string, fieldValueRaw reflect.Value, args string) ValidationError {
+func ValidateLen(field reflect.StructField, fieldValueRaw reflect.Value, args string) ValidationError {
 	result := ValidationError{
-		Field: fieldName,
+		Field: field.Name,
 		Err:   nil,
 	}
-	var fieldValues []string
-	switch fieldValueRaw.Kind() { //nolint:exhaustive
-	case reflect.String:
-		fieldValues = []string{fieldValueRaw.String()}
-	case reflect.Slice:
-		if fieldValueRaw.Type() == reflect.TypeOf(fieldValues) {
-			fieldValues = make([]string, 0)
-			fieldValues = append(fieldValues, fieldValueRaw.Interface().([]string)...)
-		} else {
-			result.Err = fmt.Errorf("invalid field value type")
-			return result
-		}
-	default:
-		result.Err = fmt.Errorf("invalid field value type")
+	fieldValue, ok := fieldValueRaw.Interface().(string)
+	if !ok {
+		result.Err = ErrValidate
 		return result
 	}
-	for _, fieldValue := range fieldValues {
-		length, err := strconv.Atoi(args)
-		if err != nil {
-			result.Err = fmt.Errorf("invalid value for len validation: %w", err)
-			return result
-		}
-		if len(fieldValue) != length {
-			result.Err = ErrValidateLen
-		}
+	length, err := strconv.Atoi(args)
+	if err != nil {
+		result.Err = fmt.Errorf("invalid value for len validation: %w", err)
+		return result
 	}
+	if len(fieldValue) != length {
+		result.Err = ErrValidateLen
+	}
+
 	return result
 }
 
-func ValidateRegexp(fieldName string, fieldValueRaw reflect.Value, reStr string) ValidationError {
+func ValidateRegexp(field reflect.StructField, fieldValueRaw reflect.Value, reStr string) ValidationError {
 	result := ValidationError{
-		Field: fieldName,
+		Field: field.Name,
 		Err:   nil,
 	}
-	var fieldValues []string
-	switch fieldValueRaw.Kind() { //nolint:exhaustive
-	case reflect.String:
-		fieldValues = []string{fieldValueRaw.String()}
-	case reflect.Slice:
-		if fieldValueRaw.Type() == reflect.TypeOf(fieldValues) {
-			fieldValues = make([]string, 0)
-			fieldValues = append(fieldValues, fieldValueRaw.Interface().([]string)...)
-		} else {
-			result.Err = fmt.Errorf("invalid field value type")
-			return result
-		}
-	default:
-		result.Err = fmt.Errorf("invalid field value type")
+	fieldValue, ok := fieldValueRaw.Interface().(string)
+	if !ok {
+		result.Err = ErrValidate
 		return result
 	}
 	re, err := regexp.Compile(reStr)
@@ -136,16 +111,14 @@ func ValidateRegexp(fieldName string, fieldValueRaw reflect.Value, reStr string)
 		result.Err = fmt.Errorf("invalid regexp: %w", err)
 		return result
 	}
-	for _, fieldValue := range fieldValues {
-		if !re.MatchString(fieldValue) {
-			result.Err = ErrValidateRegexp
-			return result
-		}
+	if !re.MatchString(fieldValue) {
+		result.Err = ErrValidateRegexp
+		return result
 	}
 	return result
 }
 
-var validationMap = map[string]func(fieldName string, fieldValue reflect.Value, args string) ValidationError{
+var validationMap = map[string]func(field reflect.StructField, fieldValue reflect.Value, args string) ValidationError{
 	"len":    ValidateLen,
 	"regexp": ValidateRegexp,
 	"in":     ValidateIn,
@@ -153,105 +126,69 @@ var validationMap = map[string]func(fieldName string, fieldValue reflect.Value, 
 	"max":    ValidateMax,
 }
 
-func ValidateIn(fieldName string, fieldValueRaw reflect.Value, args string) ValidationError {
+func ValidateIn(field reflect.StructField, fieldValueRaw reflect.Value, args string) ValidationError {
 	result := ValidationError{
-		Field: fieldName,
+		Field: field.Name,
 		Err:   nil,
 	}
-	var fieldValues []any
-	switch fieldValueRaw.Kind() { //nolint:exhaustive
-	case reflect.String:
-		fieldValues = []any{fieldValueRaw.String()}
-	case reflect.Int:
-		fieldValues = []any{fieldValueRaw.Int()}
-	case reflect.Slice:
-		for i := 0; i < fieldValueRaw.Len(); i++ {
-			fieldValues = append(fieldValues, fieldValueRaw.Index(i).Interface())
-		}
-	default:
-		result.Err = fmt.Errorf("invalid field value type")
-		return result
-	}
-	for _, fieldValue := range fieldValues {
-		fieldValueStr := fmt.Sprintf("%v", fieldValue)
-		for _, arg := range strings.Split(args, ",") {
-			if arg == fieldValueStr {
-				return result
-			}
+	fieldValueStr := fmt.Sprintf("%v", fieldValueRaw)
+	for _, arg := range strings.Split(args, ",") {
+		if arg == fieldValueStr {
+			return result
 		}
 	}
 	result.Err = ErrValidateIn
 	return result
 }
 
-func ValidateMin(fieldName string, fieldValueRaw reflect.Value, args string) ValidationError {
+func ValidateMin(field reflect.StructField, fieldValueRaw reflect.Value, args string) ValidationError {
 	result := ValidationError{
-		Field: fieldName,
+		Field: field.Name,
 		Err:   nil,
 	}
-	var fieldValues []int
-	switch fieldValueRaw.Kind() { //nolint:exhaustive
-	case reflect.Int:
-		fieldValues = []int{int(fieldValueRaw.Int())}
-	case reflect.Slice:
-		if fieldValueRaw.Type() == reflect.TypeOf(fieldValues) {
-			fieldValues = make([]int, 0)
-			fieldValues = append(fieldValues, fieldValueRaw.Interface().([]int)...)
-		} else {
-			result.Err = fmt.Errorf("invalid field value type")
-			return result
-		}
+	fieldValue, ok := fieldValueRaw.Interface().(int)
+	if !ok {
+		result.Err = ErrValidate
+		return result
 	}
 	min, err := strconv.Atoi(args)
 	if err != nil {
 		result.Err = fmt.Errorf("invalid value for min validation: %w", err)
 		return result
 	}
-	for _, fieldValue := range fieldValues {
-		if fieldValue < min {
-			result.Err = ErrValidateMin
-		}
+	if fieldValue < min {
+		result.Err = ErrValidateMin
 	}
 	return result
 }
 
-func ValidateMax(fieldName string, fieldValueRaw reflect.Value, args string) ValidationError {
+func ValidateMax(field reflect.StructField, fieldValueRaw reflect.Value, args string) ValidationError {
 	result := ValidationError{
-		Field: fieldName,
+		Field: field.Name,
 		Err:   nil,
 	}
-	var fieldValues []int
-	switch fieldValueRaw.Kind() { //nolint:exhaustive
-	case reflect.Int:
-		fieldValues = []int{int(fieldValueRaw.Int())}
-	case reflect.Slice:
-		if fieldValueRaw.Type() == reflect.TypeOf(fieldValues) {
-			fieldValues = make([]int, 0)
-			fieldValues = append(fieldValues, fieldValueRaw.Interface().([]int)...)
-		} else {
-			result.Err = fmt.Errorf("invalid field value type")
-			return result
-		}
+	fieldValue, ok := fieldValueRaw.Interface().(int)
+	if !ok {
+		result.Err = ErrValidate
+		return result
 	}
 	max, err := strconv.Atoi(args)
 	if err != nil {
 		result.Err = fmt.Errorf("invalid value for max validation: %w", err)
 		return result
 	}
-	for _, fieldValue := range fieldValues {
-		if fieldValue > max {
-			result.Err = ErrValidateMax
-		}
+	if fieldValue > max {
+		result.Err = ErrValidateMax
 	}
 	return result
 }
 
-func validationExec(fieldName string, fieldValue reflect.Value, funcName string, args string) ValidationError {
+func validationExec(field reflect.StructField, fieldValue reflect.Value, funcName string, args string) ValidationError {
 	valFunc, ok := validationMap[funcName]
 	if !ok {
 		return ValidationError{Err: errors.New("unknown validation function")}
 	}
-	return valFunc(fieldName, fieldValue, args)
+	return valFunc(field, fieldValue, args)
 }
 
 func Validate(v interface{}) error {
@@ -275,15 +212,25 @@ func Validate(v interface{}) error {
 
 	for fieldIdx := 0; fieldIdx < objType.NumField(); fieldIdx++ {
 		field := objType.Field(fieldIdx)
-
 		fieldValue := reflect.ValueOf(v).Field(fieldIdx)
 		tags := parseTagString(string(field.Tag))
 		log.Printf("field: %v, value: %v, tags: %v\n", field.Name, fieldValue, tags)
 		for funcName, args := range tags {
-			valErr := validationExec(field.Name, fieldValue, funcName, args)
-			log.Printf("validation result: %v\n", valErr)
-			if valErr.Err != nil {
-				results = append(results, valErr)
+			if fieldValue.Kind() == reflect.Slice {
+				for i := 0; i < fieldValue.Len(); i++ {
+					valErr := validationExec(field, fieldValue.Index(i), funcName, args)
+					if valErr.Err != nil {
+						results = append(results, valErr)
+					}
+					if errors.Is(valErr.Err, ErrValidate) {
+						break
+					}
+				}
+			} else {
+				valErr := validationExec(field, fieldValue, funcName, args)
+				if valErr.Err != nil {
+					results = append(results, valErr)
+				}
 			}
 		}
 	}

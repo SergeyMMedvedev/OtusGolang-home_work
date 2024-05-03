@@ -2,7 +2,6 @@ package hw09structvalidator
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"testing"
 
@@ -177,7 +176,7 @@ func TestValidateLen(t *testing.T) {
 			expectedErr: ValidationErrors{
 				ValidationError{
 					Field: "Version",
-					Err:   errors.New("invalid field value type"),
+					Err:   ErrValidate,
 				},
 			},
 		},
@@ -246,8 +245,12 @@ func TestValidateRegexp(t *testing.T) {
 		},
 		// wrong type
 		{
-			in:          123,
-			expectedErr: ValidationErrors{ValidationError{Err: ErrValidate}},
+			in: 123,
+			expectedErr: ValidationErrors{
+				ValidationError{
+					Err: ErrValidate,
+				},
+			},
 		},
 		{
 			in: struct {
@@ -257,7 +260,7 @@ func TestValidateRegexp(t *testing.T) {
 			},
 			expectedErr: ValidationErrors{ValidationError{
 				Field: "Email",
-				Err:   errors.New("invalid field value type"),
+				Err:   ErrValidate,
 			}},
 		},
 		{
@@ -268,7 +271,7 @@ func TestValidateRegexp(t *testing.T) {
 			},
 			expectedErr: ValidationErrors{ValidationError{
 				Field: "Emails",
-				Err:   errors.New("invalid field value type"),
+				Err:   ErrValidate,
 			}},
 		},
 	}
@@ -350,7 +353,12 @@ func TestValidateIn(t *testing.T) {
 			}{
 				Codes: []int{201, 404},
 			},
-			expectedErr: nil,
+			expectedErr: ValidationErrors{
+				ValidationError{
+					Field: "Codes",
+					Err:   ErrValidateIn,
+				},
+			},
 		},
 		// wrong type
 		{
@@ -485,7 +493,7 @@ func TestValidateMax(t *testing.T) {
 			in: struct {
 				Ages []int `validate:"max:17"`
 			}{
-				Ages: []int{18, 20},
+				Ages: []int{18, 17},
 			},
 			expectedErr: ValidationErrors{
 				ValidationError{
