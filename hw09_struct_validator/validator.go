@@ -195,7 +195,7 @@ func getObjType(v interface{}) reflect.Type {
 
 func Validate(v interface{}) error {
 	results := make(ValidationErrors, 0)
-	var objType = getObjType(v)
+	objType := getObjType(v)
 	if objType.Kind() != reflect.Struct {
 		return ValidationErrors{ValidationError{Err: ErrValidate}}
 	}
