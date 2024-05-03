@@ -179,9 +179,7 @@ func validationExec(field reflect.StructField, fieldValue reflect.Value, funcNam
 	return valFunc(field, fieldValue, args)
 }
 
-func Validate(v interface{}) error {
-	results := make(ValidationErrors, 0)
-
+func getObjType(v interface{}) reflect.Type {
 	var objType reflect.Type
 	if t, ok := v.(reflect.Type); ok {
 		objType = t
@@ -192,7 +190,12 @@ func Validate(v interface{}) error {
 	if objType.Kind() == reflect.Ptr {
 		objType = objType.Elem()
 	}
+	return objType
+}
 
+func Validate(v interface{}) error {
+	results := make(ValidationErrors, 0)
+	var objType = getObjType(v)
 	if objType.Kind() != reflect.Struct {
 		return ValidationErrors{ValidationError{Err: ErrValidate}}
 	}
@@ -206,7 +209,7 @@ func Validate(v interface{}) error {
 		}
 		tags := parseTagString(validateTag)
 		for funcName, args := range tags {
-			switch fieldValue.Kind() {
+			switch fieldValue.Kind() { //nolint:exhaustive
 			case reflect.Slice:
 				for i := 0; i < fieldValue.Len(); i++ {
 					valErr := validationExec(field, fieldValue.Index(i), funcName, args)
