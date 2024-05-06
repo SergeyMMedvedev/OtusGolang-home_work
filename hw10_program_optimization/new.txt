@@ -1,0 +1,7 @@
+goos: windows
+goarch: amd64
+pkg: github.com/fixme_my_friend/hw10_program_optimization
+cpu: 13th Gen Intel(R) Core(TM) i9-13900F
+BenchmarkGetDomainStat-32    	     652	   1796477 ns/op	10429149 B/op	    1095 allocs/op
+PASS
+ok  	github.com/fixme_my_friend/hw10_program_optimization	2.655s

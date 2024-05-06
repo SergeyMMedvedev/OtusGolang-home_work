@@ -2,19 +2,22 @@ package hw10programoptimization
 
 import (
 	"bufio"
+	_ "encoding/json"
+	_ "errors"
 	"fmt"
 	"io"
+	_ "regexp"
 	"strings"
 )
 
 type User struct {
-	ID       int
-	Name     string
-	Username string
-	Email    string
-	Phone    string
-	Password string
-	Address  string
+	// ID       int
+	// Name     string
+	// Username string
+	Email string
+	// Phone    string
+	// Password string
+	// Address  string
 }
 
 type DomainStat map[string]int
@@ -30,22 +33,52 @@ func GetDomainStat(r io.Reader, domain string) (DomainStat, error) {
 type users [100_000]User
 
 func getUsers(r io.Reader) (result *users, err error) {
+	// rd := bufio.NewReader(r)
 	result = new(users)
 	scanner := bufio.NewScanner(r)
-	var line []byte
+	// maxSize := 1024 * 1024
+	// buffer := make([]byte, 0, maxSize)
+	// scanner.Buffer(buffer, maxSize)
+
+	var line string
+	// var sizeSum int
 	var user User
 	var index int
+
+	// for {
+
+	// 	line, err = rd.ReadString('\n')
+	// 	if len(line) == 0 && err != nil {
+	// 		if errors.Is(err, io.EOF) {
+	// 			break
+	// 		}
+	// 		return result, err
+	// 	}
+	// 	if line == "" {
+	// 		continue
+	// 	}
+	// 	err = user.UnmarshalJSON([]byte(line))
+	// 	if err != nil {
+	// 		return result, err
+	// 	}
+	// 	// fmt.Println("rd.Size()", rd.Size())
+	// 	// sizeSum += rd.Size()
+	// 	// result = append(result, user)
+	// 	result[index] = user
+	// 	index++
+	// }
+
 	for scanner.Scan() {
-		line = scanner.Bytes()
-		err = user.UnmarshalJSON(line)
+		line = scanner.Text()
+		if line == "" {
+			continue
+		}
+		err = user.UnmarshalJSON([]byte(line))
 		if err != nil {
 			return result, err
 		}
 		result[index] = user
 		index++
-	}
-	if err := scanner.Err(); err != nil {
-		return result, err
 	}
 	return result, nil
 }
