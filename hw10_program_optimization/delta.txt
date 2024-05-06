@@ -1,0 +1,15 @@
+goos: windows
+goarch: amd64
+pkg: github.com/fixme_my_friend/hw10_program_optimization
+cpu: 13th Gen Intel(R) Core(TM) i9-13900F
+                 │   old.txt   │               new.txt               │
+                 │   sec/op    │   sec/op     vs base                │
+GetDomainStat-32   3.078m ± 4%   1.982m ± 1%  -35.63% (p=0.000 n=10)
+
+                 │   old.txt    │                 new.txt                  │
+                 │     B/op     │      B/op       vs base                  │
+GetDomainStat-32   862.7Ki ± 2%   10187.6Ki ± 0%  +1080.89% (p=0.000 n=10)
+
+                 │   old.txt   │               new.txt               │
+                 │  allocs/op  │  allocs/op   vs base                │
+GetDomainStat-32   7.933k ± 2%   1.245k ± 2%  -84.31% (p=0.000 n=10)
