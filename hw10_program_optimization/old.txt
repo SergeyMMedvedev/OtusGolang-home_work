@@ -2,6 +2,15 @@ goos: windows
 goarch: amd64
 pkg: github.com/fixme_my_friend/hw10_program_optimization
 cpu: 13th Gen Intel(R) Core(TM) i9-13900F
-BenchmarkGetDomainStat-32    	     364	   3048872 ns/op	  888914 B/op	    8373 allocs/op
+BenchmarkGetDomainStat-32    	     350	   3047887 ns/op	  906148 B/op	    8136 allocs/op
+BenchmarkGetDomainStat-32    	     361	   3084875 ns/op	  878561 B/op	    7888 allocs/op
+BenchmarkGetDomainStat-32    	     362	   3077075 ns/op	  876038 B/op	    7867 allocs/op
+BenchmarkGetDomainStat-32    	     362	   3079605 ns/op	  876140 B/op	    7867 allocs/op
+BenchmarkGetDomainStat-32    	     360	   3055182 ns/op	  880898 B/op	    7910 allocs/op
+BenchmarkGetDomainStat-32    	     358	   3281242 ns/op	  885917 B/op	    7955 allocs/op
+BenchmarkGetDomainStat-32    	     361	   3046898 ns/op	  878562 B/op	    7888 allocs/op
+BenchmarkGetDomainStat-32    	     358	   3043363 ns/op	  886128 B/op	    7955 allocs/op
+BenchmarkGetDomainStat-32    	     351	   3200297 ns/op	  903463 B/op	    8113 allocs/op
+BenchmarkGetDomainStat-32    	     352	   3109667 ns/op	  900898 B/op	    8090 allocs/op
 PASS
-ok  	github.com/fixme_my_friend/hw10_program_optimization	4.862s
+ok  	github.com/fixme_my_friend/hw10_program_optimization	39.238s
