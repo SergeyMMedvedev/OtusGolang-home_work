@@ -1,6 +1,6 @@
 module github.com/SergeyMMedvedev/OtusGolang-home_work/hw11_telnet_client
 
-go 1.22.1
+go 1.19
 
 require (
 	github.com/spf13/pflag v1.0.5
