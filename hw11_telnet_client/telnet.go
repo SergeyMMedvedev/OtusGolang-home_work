@@ -25,20 +25,8 @@ type telnetClient struct {
 	out     io.Writer
 
 	conn       net.Conn
+	inScanner  bufio.Scanner
 	outScanner bufio.Scanner
-}
-
-func (c *telnetClient) Send() error {
-	scanner := bufio.NewScanner(c.in)
-	go func() {
-		for scanner.Scan() {
-			c.conn.Write([]byte(fmt.Sprintf("%s\n", scanner.Text())))
-		}
-		if scanner.Err() != nil {
-			return
-		}
-	}()
-	return scanner.Err()
 }
 
 func (c *telnetClient) Connect() error {
@@ -48,13 +36,11 @@ func (c *telnetClient) Connect() error {
 	var err error
 	c.conn, err = dialer.DialContext(ctx, "tcp", c.Address)
 	if err != nil {
-		cancel()
-		fmt.Println("err", err)
-		return err
+		return fmt.Errorf("dial: %w", err)
 	}
 	log.Printf("connect from %s to %s\n", c.conn.LocalAddr(), c.conn.RemoteAddr())
+	c.inScanner = *bufio.NewScanner(c.in)
 	c.outScanner = *bufio.NewScanner(c.conn)
-
 	return nil
 }
 
@@ -71,14 +57,22 @@ func (c *telnetClient) Close() error {
 	return nil
 }
 
+func (c *telnetClient) writeFromScanner(scanner *bufio.Scanner, writer io.Writer) error {
+	if scanner.Scan() {
+		_, err := writer.Write([]byte(fmt.Sprintf("%s\n", scanner.Text())))
+		if err != nil {
+			return fmt.Errorf("write: %w", err)
+		}
+	}
+	return scanner.Err()
+}
+
+func (c *telnetClient) Send() error {
+	return c.writeFromScanner(&c.inScanner, c.conn)
+}
+
 func (c *telnetClient) Receive() error {
-	if c.outScanner.Scan() {
-		c.out.Write([]byte(c.outScanner.Text() + "\n"))
-	}
-	if c.outScanner.Err() != nil {
-		return c.outScanner.Err()
-	}
-	return nil
+	return c.writeFromScanner(&c.outScanner, c.out)
 }
 
 func NewTelnetClient(address string, timeout time.Duration, in io.ReadCloser, out io.Writer) TelnetClient {
