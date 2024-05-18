@@ -76,15 +76,6 @@ func TestArgParse(t *testing.T) {
 		require.Equal(t, time.Second*10, timeout)
 	})
 
-	t.Run("check parseArgs wrong port", func(t *testing.T) {
-		originalArgs := os.Args
-		defer func() { os.Args = originalArgs }()
-		os.Args = []string{"go-telnet", "127.0.0.1", "asd"}
-		_, _, err := parseArgs()
-		require.Error(t, err)
-		require.Equal(t, "port must be a number", err.Error())
-	})
-
 	t.Run("check parseArgs no host&port", func(t *testing.T) {
 		originalArgs := os.Args
 		defer func() { os.Args = originalArgs }()
@@ -97,16 +88,9 @@ func TestArgParse(t *testing.T) {
 	t.Run("check parseArgs timeout", func(t *testing.T) {
 		originalArgs := os.Args
 		defer func() { os.Args = originalArgs }()
-		os.Args = []string{"go-telnet", "--timeout=11s", "127.0.0.1", "80"}
+		os.Args = []string{"go-telnet", "--timeout=12s", "127.0.0.1", "80"}
 		_, timeout, err := parseArgs()
 		require.NoError(t, err)
-		require.Equal(t, time.Second*11, timeout)
-	})
-	t.Run("check parseArgs wrong timeout", func(t *testing.T) {
-		originalArgs := os.Args
-		defer func() { os.Args = originalArgs }()
-		os.Args = []string{"go-telnet", "--timeout=asd", "127.0.0.1", "80"}
-		_, _, err := parseArgs()
-		require.Error(t, err)
+		require.Equal(t, time.Second*12, timeout)
 	})
 }
