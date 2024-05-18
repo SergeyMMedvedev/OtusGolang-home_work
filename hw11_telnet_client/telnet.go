@@ -48,23 +48,15 @@ OUTER:
 	log.Printf("Finished readRoutine")
 }
 
-func (c telnetClient) stdinScan() chan string {
-	out := make(chan string)
+func (c *telnetClient) Send() error {
 	go func() {
-		log.Println("start stdinScan")
-		scanner := bufio.NewScanner(c.in)
-		for scanner.Scan() {
-			fmt.Println("stdinScan scanner.Scan()", scanner.Scan())
-			text := scanner.Text()
-			fmt.Println("text", text)
-			out <- text
-		}
-		if scanner.Err() != nil {
-			fmt.Println("scanner.Err()", scanner.Err())
-		}
+		str := <-c.inChan
+		log.Printf("To server %v\n", str)
+		fmt.Println("str", str)
+		fmt.Println("c.conn", c.conn)
+		c.conn.Write([]byte(fmt.Sprintf("%s\n", str)))
 	}()
-	log.Println("return out")
-	return out
+	return nil
 }
 
 type telnetClient struct {
@@ -72,43 +64,43 @@ type telnetClient struct {
 	timeout time.Duration
 	in      io.ReadCloser
 	out     io.Writer
+
+	inChan chan string
+	conn   net.Conn
 }
 
-func (c telnetClient) Connect() error {
+func (c *telnetClient) inScan() {
+	go func() {
+		scanner := bufio.NewScanner(c.in)
+		for scanner.Scan() {
+			c.inChan <- scanner.Text()
+		}
+		if scanner.Err() != nil {
+			close(c.inChan)
+		}
+	}()
+}
+
+func (c *telnetClient) Connect() error {
 	dialer := &net.Dialer{}
 	fmt.Println("c.timeout", c.timeout)
 	ctx, cancel := context.WithTimeout(context.Background(), c.timeout)
 	defer cancel()
 	fmt.Println("c.Address", c.Address)
-	conn, err := dialer.DialContext(ctx, "tcp", c.Address)
+	var err error
+	c.conn, err = dialer.DialContext(ctx, "tcp", c.Address)
 	if err != nil {
 		cancel()
 		fmt.Println("err", err)
 		return err
 	}
-	log.Printf("connect from %s to %s\n", conn.LocalAddr(), conn.RemoteAddr())
-
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		c.readRoutine(ctx, conn, wg)
-		cancel()
-	}()
-
-	wg.Add(1)
-	// send
-	ch := c.stdinScan()
-	fmt.Println("ch", ch)
-	go func() {
-		writeRoutine(ctx, conn, wg, ch)
-		cancel()
-	}()
-	wg.Wait()
+	log.Printf("connect from %s to %s\n", c.conn.LocalAddr(), c.conn.RemoteAddr())
+	c.inScan()
 
 	return nil
 }
 
-func (c telnetClient) Close() error {
+func (c *telnetClient) Close() error {
 	return c.in.Close()
 }
 
@@ -134,20 +126,26 @@ OUTER:
 	log.Printf("Finished writeRoutine")
 }
 
-func (c telnetClient) Receive() error {
-	return nil
-}
-
-func (c telnetClient) Send() error {
+func (c *telnetClient) Receive() error {
+	scanner := bufio.NewScanner(c.conn)
+	if scanner.Scan() {
+		c.out.Write([]byte(scanner.Text() + "\n"))
+	}
+	if scanner.Err() != nil {
+		return scanner.Err()
+	}
 	return nil
 }
 
 func NewTelnetClient(address string, timeout time.Duration, in io.ReadCloser, out io.Writer) TelnetClient {
-	return telnetClient{
+	inChan := make(chan string)
+	return &telnetClient{
 		Address: address,
 		timeout: timeout,
 		in:      in,
 		out:     out,
+
+		inChan: inChan,
 	}
 }
 
