@@ -18,7 +18,6 @@ var (
 
 func parseArgs() (address string, timeout time.Duration, err error) {
 	pflag.CommandLine = pflag.NewFlagSet(os.Args[0], pflag.ExitOnError)
-	fmt.Println("os.Args", os.Args)
 	var host string
 	var port int
 	timeout, err = time.ParseDuration("10s")
