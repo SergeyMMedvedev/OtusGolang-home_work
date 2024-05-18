@@ -3,11 +3,11 @@ package main
 import (
 	"bufio"
 	"context"
-	_ "errors"
 	"fmt"
 	"io"
 	"log"
 	"net"
+	"sync"
 	"time"
 )
 
@@ -18,38 +18,24 @@ type TelnetClient interface {
 	Receive() error
 }
 
+func (c *telnetClient) Send() error {
+	if !c.inScanner.Scan() {
+		return c.inScanner.Err()
+	}
+	text := c.inScanner.Text()
+	c.conn.Write([]byte(fmt.Sprintf("%s\n", text)))
+	return nil
+}
+
 type telnetClient struct {
 	Address string
 	timeout time.Duration
 	in      io.ReadCloser
 	out     io.Writer
 
-	inChan  chan string
-	outChan chan string
-	conn    net.Conn
-
+	inScanner  bufio.Scanner
 	outScanner bufio.Scanner
-}
-
-func (c *telnetClient) Send() error {
-	go func() {
-		for str := range c.inChan {
-			c.conn.Write([]byte(fmt.Sprintf("%s\n", str)))
-		}
-	}()
-	return nil
-}
-
-func (c *telnetClient) inScan() {
-	go func() {
-		scanner := bufio.NewScanner(c.in)
-		for scanner.Scan() {
-			c.inChan <- scanner.Text()
-		}
-		if scanner.Err() != nil {
-			close(c.inChan)
-		}
-	}()
+	conn       net.Conn
 }
 
 func (c *telnetClient) Connect() error {
@@ -59,20 +45,19 @@ func (c *telnetClient) Connect() error {
 	var err error
 	c.conn, err = dialer.DialContext(ctx, "tcp", c.Address)
 	if err != nil {
+		c.Close()
 		cancel()
-		fmt.Println("err", err)
-		return err
+		return fmt.Errorf("dial: %w", err)
 	}
 	log.Printf("connect from %s to %s\n", c.conn.LocalAddr(), c.conn.RemoteAddr())
+	c.inScanner = *bufio.NewScanner(in)
 	c.outScanner = *bufio.NewScanner(c.conn)
-	c.inScan()
-
 	return nil
 }
 
 func (c *telnetClient) Close() error {
-	fmt.Println("close connection")
-	err := c.conn.Close()
+	var err error
+	err = c.conn.Close()
 	if err != nil {
 		return fmt.Errorf("close connection: %w", err)
 	}
@@ -80,31 +65,32 @@ func (c *telnetClient) Close() error {
 	if err != nil {
 		return fmt.Errorf("close input: %w", err)
 	}
-	close(c.inChan)
 	return nil
 }
 
 func (c *telnetClient) Receive() error {
-	if c.outScanner.Scan() {
-		c.out.Write([]byte(c.outScanner.Text() + "\n"))
-	}
-	if c.outScanner.Err() != nil {
-		return c.outScanner.Err()
-	}
-	return nil
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		for c.outScanner.Scan() {
+			c.out.Write([]byte(c.outScanner.Text() + "\n"))
+			if c.outScanner.Err() != nil {
+				fmt.Println(c.outScanner.Err())
+				return
+			}
+		}
+		defer wg.Done()
+	}()
+	wg.Wait()
+	return c.outScanner.Err()
 }
 
 func NewTelnetClient(address string, timeout time.Duration, in io.ReadCloser, out io.Writer) TelnetClient {
-	inChan := make(chan string)
-	outChan := make(chan string)
 	return &telnetClient{
 		Address: address,
 		timeout: timeout,
 		in:      in,
 		out:     out,
-
-		inChan:  inChan,
-		outChan: outChan,
 	}
 }
 

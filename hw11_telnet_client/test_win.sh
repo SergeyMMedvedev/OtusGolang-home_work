@@ -7,7 +7,7 @@ go build -o go-telnet
 NC_PID=$!
 
 sleep 1
-(echo -e "I\nam\nTELNET client\n" && cat 2>/dev/null) | ./go-telnet --timeout=5s localhost 4242 >/tmp/telnet.out &
+(echo -e "I\nam\nTELNET client\n" && cat 2>/dev/null) | ./go-telnet --timeout=5s localhost 4242 >"F:\dev\Otus\OtusGolang-home_work\hw11_telnet_client\tmp\telnet.out" &
 TL_PID=$!
 
 sleep 5
@@ -23,12 +23,15 @@ function fileEquals() {
 expected_nc_out='I
 am
 TELNET client'
-fileEquals /tmp/nc.out "${expected_nc_out}"
+fileEquals "F:\dev\Otus\OtusGolang-home_work\hw11_telnet_client\tmp\nc.out" "${expected_nc_out}"
 
 expected_telnet_out='Hello
 From
 NC'
-fileEquals /tmp/telnet.out "${expected_telnet_out}"
+fileEquals "F:\dev\Otus\OtusGolang-home_work\hw11_telnet_client\tmp\telnet.out" "${expected_telnet_out}"
 
 rm -f go-telnet
 echo "PASS"
+
+
+ncat -l localhost 4242 >/dev/null

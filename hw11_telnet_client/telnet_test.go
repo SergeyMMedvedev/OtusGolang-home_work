@@ -34,10 +34,14 @@ func TestTelnetClient(t *testing.T) {
 			defer func() { require.NoError(t, client.Close()) }()
 
 			in.WriteString("hello\n")
+			// fmt.Println("bef send hello")
 			err = client.Send()
+			// fmt.Println("aft send hello")
 			require.NoError(t, err)
 
+			// fmt.Println("bef Receive world")
 			err = client.Receive()
+			// fmt.Println("aft Receive world")
 			require.NoError(t, err)
 			require.Equal(t, "world\n", out.String())
 		}()
