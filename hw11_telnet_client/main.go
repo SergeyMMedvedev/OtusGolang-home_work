@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"sync"
+	"os/signal"
+	_ "sync"
+	"syscall"
 )
 
 var (
@@ -25,44 +27,32 @@ func main() {
 		return
 	}
 	defer telnet.Close()
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	go func() {
-	OUTER:
-		for {
-			select {
-			case <-ctx.Done():
-				break OUTER
-			default:
-				err := telnet.Send()
-				if err != nil {
-					fmt.Println(err)
-					cancel()
-					break OUTER
-				}
+		select {
+		case <-ctx.Done():
+			fmt.Println("exiting Send")
+			return
+		default:
+			err := telnet.Send()
+			if err != nil {
+				fmt.Println(err)
+				stop()
 			}
 		}
-		defer wg.Done()
 	}()
-	wg.Add(1)
 	go func() {
-	OUTER:
-		for {
-			select {
-			case <-ctx.Done():
-				break OUTER
-			default:
-				err := telnet.Receive()
-				if err != nil {
-					fmt.Println(err)
-					cancel()
-					break OUTER
-				}
+		select {
+		case <-ctx.Done():
+			fmt.Println("exiting Receive")
+			return
+		default:
+			err := telnet.Receive()
+			if err != nil {
+				fmt.Println(err)
+				stop()
 			}
 		}
-		defer wg.Done()
 	}()
-	wg.Wait()
+	<-ctx.Done()
 }

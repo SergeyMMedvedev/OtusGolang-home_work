@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"context"
-	_ "errors"
 	"fmt"
 	"io"
 	"log"
@@ -24,9 +22,7 @@ type telnetClient struct {
 	in      io.ReadCloser
 	out     io.Writer
 
-	conn       net.Conn
-	inScanner  bufio.Scanner
-	outScanner bufio.Scanner
+	conn net.Conn
 }
 
 func (c *telnetClient) Connect() error {
@@ -39,8 +35,6 @@ func (c *telnetClient) Connect() error {
 		return fmt.Errorf("dial: %w", err)
 	}
 	log.Printf("connect from %s to %s\n", c.conn.LocalAddr(), c.conn.RemoteAddr())
-	c.inScanner = *bufio.NewScanner(c.in)
-	c.outScanner = *bufio.NewScanner(c.conn)
 	return nil
 }
 
@@ -57,22 +51,14 @@ func (c *telnetClient) Close() error {
 	return nil
 }
 
-func (c *telnetClient) writeFromScanner(scanner *bufio.Scanner, writer io.Writer) error {
-	if scanner.Scan() {
-		_, err := writer.Write([]byte(fmt.Sprintf("%s\n", scanner.Text())))
-		if err != nil {
-			return fmt.Errorf("write: %w", err)
-		}
-	}
-	return scanner.Err()
-}
-
 func (c *telnetClient) Send() error {
-	return c.writeFromScanner(&c.inScanner, c.conn)
+	_, err := io.Copy(c.conn, c.in)
+	return err
 }
 
 func (c *telnetClient) Receive() error {
-	return c.writeFromScanner(&c.outScanner, c.out)
+	_, err := io.Copy(c.out, c.conn)
+	return err
 }
 
 func NewTelnetClient(address string, timeout time.Duration, in io.ReadCloser, out io.Writer) TelnetClient {
