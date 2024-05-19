@@ -31,12 +31,10 @@ func main() {
 	go func() {
 		select {
 		case <-ctx.Done():
-			fmt.Println("exiting Send")
 			return
 		default:
 			err := telnet.Send()
 			if err != nil {
-				fmt.Println(err)
 				stop()
 			}
 		}
@@ -44,12 +42,10 @@ func main() {
 	go func() {
 		select {
 		case <-ctx.Done():
-			fmt.Println("exiting Receive")
 			return
 		default:
 			err := telnet.Receive()
 			if err != nil {
-				fmt.Println(err)
 				stop()
 			}
 		}
