@@ -34,7 +34,8 @@ func main() {
 		default:
 			err := telnet.Send()
 			if err != nil {
-				return
+				telnet.Close()
+				stop()
 			}
 		}
 	}()
@@ -45,7 +46,8 @@ func main() {
 		default:
 			err := telnet.Receive()
 			if err != nil {
-				return
+				telnet.Close()
+				stop()
 			}
 		}
 	}()
