@@ -23,7 +23,6 @@ func main() {
 	telnet := NewTelnetClient(flags.address, flags.timeout, in, out)
 	err = telnet.Connect()
 	if err != nil {
-		fmt.Println(err)
 		return
 	}
 	defer telnet.Close()
