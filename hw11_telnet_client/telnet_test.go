@@ -70,17 +70,17 @@ func TestArgParse(t *testing.T) {
 		originalArgs := os.Args
 		defer func() { os.Args = originalArgs }()
 		os.Args = []string{"go-telnet", "127.0.0.1", "80"}
-		address, timeout, err := parseArgs()
+		flags, err := parseArgs()
 		require.NoError(t, err)
-		require.Equal(t, "127.0.0.1:80", address)
-		require.Equal(t, time.Second*10, timeout)
+		require.Equal(t, "127.0.0.1:80", flags.address)
+		require.Equal(t, time.Second*10, flags.timeout)
 	})
 
 	t.Run("check parseArgs no host&port", func(t *testing.T) {
 		originalArgs := os.Args
 		defer func() { os.Args = originalArgs }()
 		os.Args = []string{"go-telnet"}
-		_, _, err := parseArgs()
+		_, err := parseArgs()
 		require.Error(t, err)
 		require.Equal(t, "host and port is required", err.Error())
 	})
@@ -89,8 +89,8 @@ func TestArgParse(t *testing.T) {
 		originalArgs := os.Args
 		defer func() { os.Args = originalArgs }()
 		os.Args = []string{"go-telnet", "--timeout=12s", "127.0.0.1", "80"}
-		_, timeout, err := parseArgs()
+		flags, err := parseArgs()
 		require.NoError(t, err)
-		require.Equal(t, time.Second*12, timeout)
+		require.Equal(t, time.Second*12, flags.timeout)
 	})
 }

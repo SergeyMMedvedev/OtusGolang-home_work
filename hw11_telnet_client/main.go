@@ -15,12 +15,12 @@ var (
 )
 
 func main() {
-	address, timeout, err := parseArgs()
+	flags, err := parseArgs()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	telnet := NewTelnetClient(address, timeout, in, out)
+	telnet := NewTelnetClient(flags.address, flags.timeout, in, out)
 	err = telnet.Connect()
 	if err != nil {
 		fmt.Println(err)

@@ -9,20 +9,27 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func parseArgs() (address string, timeout time.Duration, err error) {
+type Flags struct {
+	address string
+	timeout time.Duration
+}
+
+func parseArgs() (flags Flags, err error) {
+	var timeout time.Duration
 	pflag.CommandLine = pflag.NewFlagSet(os.Args[0], pflag.ExitOnError)
 	defaultTimeout, err := time.ParseDuration("10s")
 	if err != nil {
-		return "", 0, err
+		return flags, err
 	}
 	pflag.DurationVar(&timeout, "timeout", defaultTimeout, "connection timeout")
 	pflag.Lookup("timeout").NoOptDefVal = "10s"
 	pflag.Parse()
 	args := pflag.Args()
 	if len(args) != 2 {
-		return "", 0, fmt.Errorf("host and port is required")
+		return flags, fmt.Errorf("host and port is required")
 	}
-	host := args[0]
-	port := args[1]
-	return net.JoinHostPort(host, port), timeout, nil
+	return Flags{
+		address: net.JoinHostPort(args[0], args[1]),
+		timeout: timeout,
+	}, nil
 }
