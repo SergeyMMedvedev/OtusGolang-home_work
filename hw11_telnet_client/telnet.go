@@ -37,7 +37,6 @@ func (c *telnetClient) Connect() error {
 }
 
 func (c *telnetClient) Close() error {
-	fmt.Println("close connection")
 	if c.conn == nil {
 		return nil
 	}
