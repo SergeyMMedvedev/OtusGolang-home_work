@@ -40,13 +40,13 @@ func (c *telnetClient) Close() error {
 	if c.conn == nil {
 		return nil
 	}
-	err := c.conn.Close()
-	if err != nil {
-		return fmt.Errorf("close connection: %w", err)
-	}
-	err = c.in.Close()
+	err := c.in.Close()
 	if err != nil {
 		return fmt.Errorf("close input: %w", err)
+	}
+	err = c.conn.Close()
+	if err != nil {
+		return fmt.Errorf("close connection: %w", err)
 	}
 	return nil
 }
