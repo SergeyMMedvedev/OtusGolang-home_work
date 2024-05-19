@@ -26,7 +26,7 @@ func main() {
 		return
 	}
 	defer telnet.Close()
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT)
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		select {
 		case <-ctx.Done():
@@ -34,7 +34,6 @@ func main() {
 		default:
 			err := telnet.Send()
 			if err != nil {
-				telnet.Close()
 				stop()
 			}
 		}
@@ -46,7 +45,6 @@ func main() {
 		default:
 			err := telnet.Receive()
 			if err != nil {
-				telnet.Close()
 				stop()
 			}
 		}
