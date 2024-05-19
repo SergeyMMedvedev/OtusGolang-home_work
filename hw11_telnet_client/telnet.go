@@ -34,7 +34,7 @@ func (c *telnetClient) Connect() error {
 	if err != nil {
 		return fmt.Errorf("dial: %w", err)
 	}
-	log.Printf("connect from %s to %s\n", c.conn.LocalAddr(), c.conn.RemoteAddr())
+	// log.Printf("connect from %s to %s\n", c.conn.LocalAddr(), c.conn.RemoteAddr())
 	return nil
 }
 
