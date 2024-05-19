@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	_ "syscall"
 	"time"
 )
 
@@ -44,10 +45,10 @@ func (c *telnetClient) Close() error {
 	if err != nil {
 		return fmt.Errorf("close input: %w", err)
 	}
-	// err = c.conn.Close()
-	// if err != nil {
-	// 	return fmt.Errorf("close connection: %w", err)
-	// }
+	err = c.conn.Close()
+	if err != nil {
+		return fmt.Errorf("close connection: %w", err)
+	}
 	return nil
 }
 
