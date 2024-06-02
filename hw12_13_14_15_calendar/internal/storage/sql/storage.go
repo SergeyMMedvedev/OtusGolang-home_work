@@ -52,7 +52,7 @@ func (s *Storage) Connect(ctx context.Context) error {
 	return s.db.PingContext(ctx)
 }
 
-func (s *Storage) Migrate(ctx context.Context) (err error) {
+func (s *Storage) Migrate(_ context.Context) (err error) {
 	if err := goose.SetDialect("postgres"); err != nil {
 		return fmt.Errorf("cannot set dialect: %w", err)
 	}

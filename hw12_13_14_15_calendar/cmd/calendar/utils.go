@@ -18,12 +18,13 @@ type Storage interface { // TODO
 }
 
 func NewStorage(config config.StorageConf) (storage Storage, err error) {
-	if config.Type == "psql" {
+	switch config.Type {
+	case "psql":
 		storage = sqlstorage.New(config.Psql)
-	} else if config.Type == "memory" {
+	case "memory":
 		storage = memorystorage.New()
-	} else {
-		return nil, errors.New("Unknown storage type")
+	default:
+		return nil, errors.New("unknown storage type")
 	}
 	return storage, nil
 }

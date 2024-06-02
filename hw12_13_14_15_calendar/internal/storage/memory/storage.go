@@ -11,7 +11,7 @@ import (
 
 type Storage struct {
 	events map[string]storage.Event
-	mu     sync.RWMutex //nolint:unused
+	mu     sync.RWMutex
 }
 
 func New() *Storage {
@@ -21,7 +21,7 @@ func New() *Storage {
 	}
 }
 
-func (s *Storage) ListEvents(ctx context.Context) (events []storage.Event, err error) {
+func (s *Storage) ListEvents(_ context.Context) (events []storage.Event, err error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -32,7 +32,7 @@ func (s *Storage) ListEvents(ctx context.Context) (events []storage.Event, err e
 	return
 }
 
-func (s *Storage) CreateEvent(ctx context.Context, event storage.Event) error {
+func (s *Storage) CreateEvent(_ context.Context, event storage.Event) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -41,7 +41,7 @@ func (s *Storage) CreateEvent(ctx context.Context, event storage.Event) error {
 	return nil
 }
 
-func (s *Storage) DeleteEvent(ctx context.Context, eventID string) error {
+func (s *Storage) DeleteEvent(_ context.Context, eventID string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -50,7 +50,7 @@ func (s *Storage) DeleteEvent(ctx context.Context, eventID string) error {
 	return nil
 }
 
-func (s *Storage) UpdateEvent(ctx context.Context, newEvent storage.Event) error {
+func (s *Storage) UpdateEvent(_ context.Context, newEvent storage.Event) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	event := s.events[*newEvent.ID]
@@ -64,19 +64,17 @@ func (s *Storage) UpdateEvent(ctx context.Context, newEvent storage.Event) error
 				oldField.Elem().Set(newField.Elem())
 			}
 		} else {
-			return fmt.Errorf(
-				"field %s is not settable\n", oldField.Type().Name(),
-			)
+			return fmt.Errorf("field %s is not settable", oldField.Type().Name())
 		}
 	}
 	return nil
 }
 
-func (s *Storage) Connect(ctx context.Context) error {
+func (s *Storage) Connect(_ context.Context) error {
 	return nil
 }
 
-func (s *Storage) Migrate(ctx context.Context) error {
+func (s *Storage) Migrate(_ context.Context) error {
 	return nil
 }
 
