@@ -1,14 +1,83 @@
 package memorystorage
 
-import "sync"
+import (
+	"context"
+	"fmt"
+	"reflect"
+	"sync"
+
+	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage"
+)
 
 type Storage struct {
-	// TODO
-	mu sync.RWMutex //nolint:unused
+	events map[string]storage.Event
+	mu     sync.RWMutex //nolint:unused
 }
 
 func New() *Storage {
-	return &Storage{}
+	events := make(map[string]storage.Event)
+	return &Storage{
+		events: events,
+	}
+}
+
+func (s *Storage) ListEvents(ctx context.Context) (events []storage.Event, err error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	for _, event := range s.events {
+		events = append(events, event)
+	}
+
+	return
+}
+
+func (s *Storage) CreateEvent(ctx context.Context, event storage.Event) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.events[*event.ID] = event
+
+	return nil
+}
+
+func (s *Storage) DeleteEvent(ctx context.Context, eventID string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	delete(s.events, eventID)
+
+	return nil
+}
+
+func (s *Storage) UpdateEvent(ctx context.Context, newEvent storage.Event) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	event := s.events[*newEvent.ID]
+	newEventValue := reflect.ValueOf(newEvent)
+	oldEventValue := reflect.ValueOf(&event).Elem()
+	for i := 0; i < newEventValue.NumField(); i++ {
+		newField := newEventValue.Field(i)
+		oldField := oldEventValue.Field(i)
+		if oldField.CanSet() {
+			if !newField.IsNil() {
+				oldField.Elem().Set(newField.Elem())
+			}
+		} else {
+			return fmt.Errorf(
+				"field %s is not settable\n", oldField.Type().Name(),
+			)
+		}
+	}
+	return nil
+}
+
+func (s *Storage) Connect(ctx context.Context) error {
+	return nil
+}
+
+func (s *Storage) Migrate(ctx context.Context) error {
+	return nil
 }
 
 // TODO
