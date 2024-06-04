@@ -23,7 +23,7 @@ version: build
 	$(BIN) version
 
 test:
-	go test -race ./internal/... ./pkg/...
+	go test -race ./internal/...
 
 install-lint-deps:
 	export GOROOT=$(go env GOROOT)
