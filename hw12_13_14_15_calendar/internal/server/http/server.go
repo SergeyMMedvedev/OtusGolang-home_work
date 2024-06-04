@@ -47,8 +47,7 @@ func (s *Server) Start(_ context.Context) error {
 		Handler:           loggingMiddleware(mux),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
-	srv.ListenAndServe()
-	return nil
+	return srv.ListenAndServe()
 }
 
 func (s *Server) Stop(ctx context.Context) error {
