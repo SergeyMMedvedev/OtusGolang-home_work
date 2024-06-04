@@ -10,10 +10,13 @@ linters-settings:
     statements: 80
   depguard:
     rules:
+      allow-tests: true
       prevent_unmaintained_packages:
         list-mode: lax
         allow:
           - "github.com"
+          - "golang.org" 
+          - "$gostd"
 
 issues:
   exclude-rules:
