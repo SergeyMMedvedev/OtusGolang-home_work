@@ -1,5 +1,19 @@
 [logger]
 level = "INFO"
 
-# TODO
-# ...
+[storage]
+    type = "psql"
+
+    [storage.psql]
+    host = "localhost"
+    port = 5432
+    user = "otus_user"
+    password = "otus_password"
+    dbname = "calendar"
+    sslmode = "disable"
+    migration_dir = "migrations"
+    exec_migration = true
+
+[server]
+    host = "localhost"
+    port = 8080
