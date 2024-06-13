@@ -14,12 +14,19 @@ import (
 	c "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/config"
 	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/logger"
 	internalhttp "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/server/http"
+	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage"
+	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage/schemas"
+	"github.com/google/uuid"
 )
 
-var configFile string
+var (
+	configFile string
+	migrate    bool
+)
 
 func init() {
 	flag.StringVar(&configFile, "config", "/etc/calendar/config.toml", "Path to configuration file")
+	flag.BoolVar(&migrate, "migrate", false, "Run database migrations")
 }
 
 func main() {
@@ -43,7 +50,7 @@ func main() {
 	}
 	slog.Info("config: " + config.String())
 
-	storage, err := NewStorage(config.Storage)
+	storage, err := storage.NewStorage(config.Storage)
 	if err != nil {
 		slog.Error("failed to create storage: " + err.Error())
 		os.Exit(1)
@@ -81,7 +88,49 @@ func main() {
 	}()
 
 	slog.Info("calendar is running...")
+	event := schemas.Event{
+		ID:               uuid.New().String(),
+		Title:            "Test",
+		Description:      "Test",
+		Date:             time.Now(),
+		Duration:         time.Second.String(),
+		UserID:           uuid.New().String(),
+		NotificationTime: time.Second.String(),
+	}
+	err = calendar.CreateEvent(
+		ctx,
+		event.ID,
+		event.Title,
+		event.Date,
+		event.Duration,
+		event.Description,
+		event.UserID,
+		event.NotificationTime,
+	)
+	if err != nil {
+		slog.Error("failed to create event: " + err.Error())
+	}
+	events, err := calendar.ListEvents(ctx)
+	if err != nil {
+		slog.Error("failed to list events: " + err.Error())
+	}
+	for _, event := range events {
+		slog.Info("event: " + event.String())
+	}
 
+	event.Description = "new description"
+	err = storage.UpdateEvent(ctx, event)
+	if err != nil {
+		slog.Error("failed to update event: " + err.Error())
+	}
+
+	events, err = calendar.ListEvents(ctx)
+	if err != nil {
+		slog.Error("failed to list events: " + err.Error())
+	}
+	for _, event := range events {
+		slog.Info("event: " + event.String())
+	}
 	if err := server.Start(ctx); err != nil {
 		slog.Error("failed to start http server: " + err.Error())
 		cancel()

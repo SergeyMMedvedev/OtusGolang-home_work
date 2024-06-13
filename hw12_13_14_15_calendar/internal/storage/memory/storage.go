@@ -3,25 +3,24 @@ package memorystorage
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"sync"
 
-	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage"
+	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage/schemas"
 )
 
 type Storage struct {
-	events map[string]storage.Event
+	events map[string]schemas.Event
 	mu     sync.RWMutex
 }
 
 func New() *Storage {
-	events := make(map[string]storage.Event)
+	events := make(map[string]schemas.Event)
 	return &Storage{
 		events: events,
 	}
 }
 
-func (s *Storage) ListEvents(_ context.Context) (events []storage.Event, err error) {
+func (s *Storage) ListEvents(_ context.Context) (events []schemas.Event, err error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -32,11 +31,11 @@ func (s *Storage) ListEvents(_ context.Context) (events []storage.Event, err err
 	return
 }
 
-func (s *Storage) CreateEvent(_ context.Context, event storage.Event) error {
+func (s *Storage) CreateEvent(_ context.Context, event schemas.Event) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	s.events[*event.ID] = event
+	s.events[event.ID] = event
 
 	return nil
 }
@@ -50,24 +49,14 @@ func (s *Storage) DeleteEvent(_ context.Context, eventID string) error {
 	return nil
 }
 
-func (s *Storage) UpdateEvent(_ context.Context, newEvent storage.Event) error {
+func (s *Storage) UpdateEvent(_ context.Context, newEvent schemas.Event) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	event := s.events[*newEvent.ID]
-	newEventValue := reflect.ValueOf(newEvent)
-	oldEventValue := reflect.ValueOf(&event).Elem()
-	for i := 0; i < newEventValue.NumField(); i++ {
-		newField := newEventValue.Field(i)
-		oldField := oldEventValue.Field(i)
-		if oldField.CanSet() {
-			if !newField.IsNil() {
-				oldField.Elem().Set(newField.Elem())
-			}
-		} else {
-			return fmt.Errorf("field %s is not settable", oldField.Type().Name())
-		}
+	if _, ok := s.events[newEvent.ID]; ok {
+		s.events[newEvent.ID] = newEvent
+		return nil
 	}
-	return nil
+	return fmt.Errorf("event with id %s not found", newEvent.ID)
 }
 
 func (s *Storage) Connect(_ context.Context) error {

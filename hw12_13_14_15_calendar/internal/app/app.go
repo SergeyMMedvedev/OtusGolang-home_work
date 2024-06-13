@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"time"
 
-	storage "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage"
+	schemas "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage/schemas"
 )
 
 type App struct {
@@ -15,10 +15,10 @@ type App struct {
 }
 
 type Storage interface {
-	CreateEvent(ctx context.Context, event storage.Event) error
-	ListEvents(ctx context.Context) ([]storage.Event, error)
+	CreateEvent(ctx context.Context, event schemas.Event) error
+	ListEvents(ctx context.Context) ([]schemas.Event, error)
 	DeleteEvent(ctx context.Context, id string) error
-	UpdateEvent(ctx context.Context, newEvent storage.Event) error
+	UpdateEvent(ctx context.Context, newEvent schemas.Event) error
 }
 
 func New(log *slog.Logger, storage Storage) *App {
@@ -30,17 +30,17 @@ func New(log *slog.Logger, storage Storage) *App {
 
 func (a *App) CreateEvent(
 	ctx context.Context,
-	id, title *string,
-	date *time.Time,
-	duration *string,
-	descr *string,
-	userID *string,
-	notificationTime *string,
+	id, title string,
+	date time.Time,
+	duration string,
+	descr string,
+	userID string,
+	notificationTime string,
 ) error {
-	a.logger.Info("CreateEvent", "id", *id, "title", *title)
+	a.logger.Info("CreateEvent", "id", id, "title", title)
 	return a.storage.CreateEvent(
 		ctx,
-		storage.Event{
+		schemas.Event{
 			ID:               id,
 			Title:            title,
 			Date:             date,
@@ -52,7 +52,7 @@ func (a *App) CreateEvent(
 	)
 }
 
-func (a *App) ListEvents(ctx context.Context) (events []storage.Event, err error) {
+func (a *App) ListEvents(ctx context.Context) (events []schemas.Event, err error) {
 	events, err = a.storage.ListEvents(ctx)
 	if err != nil {
 		a.logger.Error("ListEvents", "err", err)
@@ -68,9 +68,9 @@ func (a *App) DeleteEvent(ctx context.Context, id string) error {
 
 func (a *App) UpdateEvent(
 	ctx context.Context,
-	event storage.Event,
+	event schemas.Event,
 ) error {
-	a.logger.Info("UpdateEvent", "id", *event.ID)
+	a.logger.Info("UpdateEvent", "id", event.ID)
 	return a.storage.UpdateEvent(
 		ctx,
 		event,

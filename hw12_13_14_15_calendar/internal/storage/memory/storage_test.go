@@ -6,26 +6,20 @@ import (
 	"testing"
 	"time"
 
-	storage "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage"
+	schemas "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage/schemas"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
-func getNewEvent() storage.Event {
-	event := storage.NewEvent()
-	event.ID = new(string)
-	event.Title = new(string)
-	event.Date = new(time.Time)
-	event.Duration = new(string)
-	event.Description = new(string)
-	event.UserID = new(string)
+func getNewEvent() schemas.Event {
+	event := schemas.NewEvent()
 
-	*event.ID = uuid.New().String()
-	*event.Title = "Event title"
-	*event.Date = time.Now().Add(time.Hour * 24)
-	*event.Duration = "30:00:00"
-	*event.Description = "Event description"
-	*event.UserID = uuid.New().String()
+	event.ID = uuid.New().String()
+	event.Title = "Event title"
+	event.Date = time.Now().Add(time.Hour * 24)
+	event.Duration = "30:00:00"
+	event.Description = "Event description"
+	event.UserID = uuid.New().String()
 	return event
 }
 
@@ -46,18 +40,18 @@ func TestStorage(t *testing.T) {
 	require.Len(t, events, 1)
 
 	newTitle := "New title"
-	err = s.UpdateEvent(ctx, storage.Event{
+	err = s.UpdateEvent(ctx, schemas.Event{
 		ID:    event.ID,
-		Title: &newTitle,
+		Title: newTitle,
 	})
 	require.NoError(t, err)
 
 	events, err = s.ListEvents(ctx)
 	event = events[0]
 	require.NoError(t, err)
-	require.Equal(t, newTitle, *event.Title)
+	require.Equal(t, newTitle, event.Title)
 
-	err = s.DeleteEvent(ctx, *event.ID)
+	err = s.DeleteEvent(ctx, event.ID)
 	require.NoError(t, err)
 	events, err = s.ListEvents(ctx)
 	require.NoError(t, err)

@@ -3,36 +3,37 @@ package sqlstorage
 import (
 	"context"
 	"fmt"
-	"reflect"
 
 	c "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/config"
-	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage"
+	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage/schemas"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" // for sqlx
 	"github.com/pressly/goose/v3"
 )
 
 type Storage struct { // TODO
-	Host      string
-	Port      int64
-	User      string
-	Pass      string
-	DBName    string
-	Sslmode   string
-	Migration string
+	Host          string
+	Port          int64
+	User          string
+	Pass          string
+	DBName        string
+	Sslmode       string
+	MigrationDir  string
+	ExecMigration bool
 
 	db *sqlx.DB
 }
 
 func New(conf c.PsqlConf) *Storage {
 	return &Storage{
-		Host:      conf.Host,
-		Port:      conf.Port,
-		User:      conf.User,
-		Pass:      conf.Password,
-		DBName:    conf.Dbname,
-		Sslmode:   conf.Sslmode,
-		Migration: conf.Migration,
+		Host:          conf.Host,
+		Port:          conf.Port,
+		User:          conf.User,
+		Pass:          conf.Password,
+		DBName:        conf.Dbname,
+		Sslmode:       conf.Sslmode,
+		MigrationDir:  conf.MigrationDir,
+		ExecMigration: conf.ExecMigration,
 	}
 }
 
@@ -53,13 +54,14 @@ func (s *Storage) Connect(ctx context.Context) error {
 }
 
 func (s *Storage) Migrate(_ context.Context) (err error) {
-	if err := goose.SetDialect("postgres"); err != nil {
-		return fmt.Errorf("cannot set dialect: %w", err)
+	if s.ExecMigration {
+		if err := goose.SetDialect("postgres"); err != nil {
+			return fmt.Errorf("cannot set dialect: %w", err)
+		}
+		if err := goose.Up(s.db.DB, s.MigrationDir); err != nil {
+			return fmt.Errorf("cannot do up migration: %w", err)
+		}
 	}
-	if err := goose.Up(s.db.DB, s.Migration); err != nil {
-		return fmt.Errorf("cannot do up migration: %w", err)
-	}
-
 	return nil
 }
 
@@ -67,14 +69,14 @@ func (s *Storage) Close() error {
 	return s.db.Close()
 }
 
-func (s *Storage) ListEvents(ctx context.Context) (events []storage.Event, err error) {
+func (s *Storage) ListEvents(ctx context.Context) (events []schemas.Event, err error) {
 	query := "select * from events"
 	rows, err := s.db.QueryxContext(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}
 	for rows.Next() {
-		var event storage.Event
+		var event schemas.Event
 		if err := rows.StructScan(&event); err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
@@ -83,8 +85,7 @@ func (s *Storage) ListEvents(ctx context.Context) (events []storage.Event, err e
 	return events, nil
 }
 
-func (s *Storage) CreateEvent(ctx context.Context, event storage.Event) error {
-	fmt.Printf("%+v\n", event)
+func (s *Storage) CreateEvent(ctx context.Context, event schemas.Event) error {
 	query := `
 	insert into events 
 	(id, title, date, duration, description, user_id, notification_time) 
@@ -130,28 +131,22 @@ func (s *Storage) DeleteEvent(ctx context.Context, eventID string) error {
 	return nil
 }
 
-func (s *Storage) UpdateEvent(ctx context.Context, newEvent storage.Event) error {
-	query := "UPDATE events SET "
-
-	args := []interface{}{}
-	idx := 1
-	newEventValue := reflect.ValueOf(newEvent)
-	for i := 0; i < newEventValue.NumField(); i++ {
-		v := newEventValue.Field(i)
-		if !v.IsNil() {
-			query += fmt.Sprintf("%s = $%d, ", newEventValue.Type().Field(i).Name, idx)
-			args = append(args, v.Interface())
-			idx++
-		}
-	}
-
-	query = query[:len(query)-2]
-	query += fmt.Sprintf(" WHERE id = $%d", idx)
-	args = append(args, newEvent.ID)
-	result, err := s.db.ExecContext(
+func (s *Storage) UpdateEvent(ctx context.Context, newEvent schemas.Event) error {
+	query := `
+	UPDATE events 
+	SET 
+	title = :title,
+	date = :date,
+	duration = :duration,
+	description = :description,
+	user_id = :user_id,
+	notification_time = :notification_time
+	where id = :id
+	`
+	result, err := s.db.NamedExecContext(
 		ctx,
 		query,
-		args...,
+		newEvent,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to execute query: %w", err)

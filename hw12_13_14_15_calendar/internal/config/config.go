@@ -31,13 +31,14 @@ type StorageConf struct {
 }
 
 type PsqlConf struct {
-	Host      string
-	Port      int64
-	User      string
-	Password  string
-	Dbname    string
-	Sslmode   string
-	Migration string
+	Host          string
+	Port          int64
+	User          string
+	Password      string
+	Dbname        string
+	Sslmode       string
+	MigrationDir  string `toml:"migration_dir"`
+	ExecMigration bool   `toml:"exec_migration"`
 }
 
 func NewConfig() Config {
