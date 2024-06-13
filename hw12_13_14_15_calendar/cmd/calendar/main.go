@@ -15,8 +15,6 @@ import (
 	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/logger"
 	internalhttp "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/server/http"
 	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage"
-	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage/schemas"
-	"github.com/google/uuid"
 )
 
 var (
@@ -88,49 +86,6 @@ func main() {
 	}()
 
 	slog.Info("calendar is running...")
-	event := schemas.Event{
-		ID:               uuid.New().String(),
-		Title:            "Test",
-		Description:      "Test",
-		Date:             time.Now(),
-		Duration:         time.Second.String(),
-		UserID:           uuid.New().String(),
-		NotificationTime: time.Second.String(),
-	}
-	err = calendar.CreateEvent(
-		ctx,
-		event.ID,
-		event.Title,
-		event.Date,
-		event.Duration,
-		event.Description,
-		event.UserID,
-		event.NotificationTime,
-	)
-	if err != nil {
-		slog.Error("failed to create event: " + err.Error())
-	}
-	events, err := calendar.ListEvents(ctx)
-	if err != nil {
-		slog.Error("failed to list events: " + err.Error())
-	}
-	for _, event := range events {
-		slog.Info("event: " + event.String())
-	}
-
-	event.Description = "new description"
-	err = storage.UpdateEvent(ctx, event)
-	if err != nil {
-		slog.Error("failed to update event: " + err.Error())
-	}
-
-	events, err = calendar.ListEvents(ctx)
-	if err != nil {
-		slog.Error("failed to list events: " + err.Error())
-	}
-	for _, event := range events {
-		slog.Info("event: " + event.String())
-	}
 	if err := server.Start(ctx); err != nil {
 		slog.Error("failed to start http server: " + err.Error())
 		cancel()
