@@ -3,8 +3,8 @@ package app
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"log/slog"
-	"time"
 
 	schemas "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage/schemas"
 )
@@ -30,24 +30,19 @@ func New(log *slog.Logger, storage Storage) *App {
 
 func (a *App) CreateEvent(
 	ctx context.Context,
-	id, title string,
-	date time.Time,
-	duration string,
-	descr string,
-	userID string,
-	notificationTime string,
+	event schemas.Event,
 ) error {
-	a.logger.Info("CreateEvent", "id", id, "title", title)
+	a.logger.Info("CreateEvent", "id", event.ID, "title", event.Title)
 	return a.storage.CreateEvent(
 		ctx,
 		schemas.Event{
-			ID:               id,
-			Title:            title,
-			Date:             date,
-			Duration:         duration,
-			Description:      descr,
-			UserID:           userID,
-			NotificationTime: notificationTime,
+			ID:               uuid.New().String(),
+			Title:            event.Title,
+			Date:             event.Date,
+			Duration:         event.Duration,
+			Description:      event.Description,
+			UserID:           event.UserID,
+			NotificationTime: event.NotificationTime,
 		},
 	)
 }

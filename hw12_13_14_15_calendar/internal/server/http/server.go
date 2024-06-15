@@ -23,7 +23,7 @@ func init() {
 }
 
 type Server struct {
-	config config.ServerConf
+	config config.HTTPServerConf
 	logger *slog.Logger
 	srv    *http.Server
 	app    Application
@@ -32,7 +32,7 @@ type Server struct {
 type Application interface { // TODO
 }
 
-func NewServer(logger *slog.Logger, app Application, config config.ServerConf) *Server {
+func NewServer(logger *slog.Logger, app Application, config config.HTTPServerConf) *Server {
 	return &Server{
 		config: config,
 		logger: logger,
@@ -42,12 +42,12 @@ func NewServer(logger *slog.Logger, app Application, config config.ServerConf) *
 
 func (s *Server) Start(_ context.Context) error {
 	s.logger.Info("Start server", "host", s.config.Host, "port", s.config.Port)
-	srv := &http.Server{
+	s.srv = &http.Server{
 		Addr:              fmt.Sprintf("%s:%d", s.config.Host, s.config.Port),
 		Handler:           loggingMiddleware(mux),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
-	return srv.ListenAndServe()
+	return s.srv.ListenAndServe()
 }
 
 func (s *Server) Stop(ctx context.Context) error {
