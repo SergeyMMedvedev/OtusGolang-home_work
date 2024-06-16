@@ -1,1 +1,17 @@
 version: "3"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: hw12_13_14_15_calendar
+    environment:
+      POSTGRES_USER: otus_user
+      POSTGRES_PASSWORD: otus_password
+      POSTGRES_DB: calendar
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

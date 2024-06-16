@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option go_package = "internal/pb";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+message Event {
+    string id = 1;
+    string title = 2;
+    google.protobuf.Timestamp date = 3;
+    google.protobuf.Duration duration = 4;
+    string description = 5;
+    string user_id = 6;
+    google.protobuf.Duration notification_time = 7;
+}
