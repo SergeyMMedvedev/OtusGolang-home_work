@@ -1,0 +1,32 @@
+
+GET http://localhost:50052/events
+
+### 
+POST http://localhost:50052/events
+Content-Type: application/json
+
+{
+    "title": "222",
+    "date": "1970-01-01T00:00:00Z",
+    "duration": "123s",
+    "description": "321",
+    "userId": "f689adda-d179-4b34-9b26-dfc6eeecd352",
+    "notificationTime": "23s"
+}
+
+### 
+PATCH http://localhost:50052/events
+Content-Type: application/json
+
+{
+    "id": "10e22893-71c6-4517-ace7-c4b10503c7c6",
+    "title": "333",
+    "date": "1970-01-01T00:00:00Z",
+    "duration": "123s",
+    "description": "321",
+    "userId": "f689adda-d179-4b34-9b26-dfc6eeecd352",
+    "notificationTime": "23s"
+}
+
+### 
+DELETE http://localhost:50052/events/10e22893-71c6-4517-ace7-c4b10503c7c6

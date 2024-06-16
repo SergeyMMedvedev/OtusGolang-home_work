@@ -1,0 +1,333 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "EventService.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "EventService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/events": {
+      "get": {
+        "operationId": "EventService_List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/eventListEventResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "EventService"
+        ]
+      },
+      "post": {
+        "operationId": "EventService_Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/eventCreateEventResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/eventCreateEventRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EventService"
+        ]
+      },
+      "patch": {
+        "operationId": "EventService_Update",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/eventUpdateEventResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/eventUpdateEventRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EventService"
+        ]
+      }
+    },
+    "/events/{id}": {
+      "delete": {
+        "operationId": "EventService_Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/eventDeleteEventResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "EventService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "Date": {
+      "type": "object",
+      "properties": {
+        "year": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without\r\na year."
+        },
+        "month": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a\r\nmonth and day."
+        },
+        "day": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0\r\nto specify a year by itself or a year and month where the day isn't\r\nsignificant."
+        }
+      },
+      "description": "Represents a whole or partial calendar date, such as a birthday. The time of\r\nday and time zone are either specified elsewhere or are insignificant. The\r\ndate is relative to the Gregorian Calendar. This can represent one of the\r\nfollowing:\r\n\r\n* A full date, with non-zero year, month, and day values\r\n* A month and day value, with a zero year, such as an anniversary\r\n* A year on its own, with zero month and day values\r\n* A year and month value, with a zero day, such as a credit card expiration\r\ndate\r\n\r\nRelated types are [google.type.TimeOfDay][google.type.TimeOfDay] and\r\n`google.protobuf.Timestamp`."
+    },
+    "Event": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "notificationTime": {
+          "type": "string"
+        }
+      }
+    },
+    "Month": {
+      "type": "object",
+      "properties": {
+        "year": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without\r\na year."
+        },
+        "month": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a\r\nmonth and day."
+        }
+      }
+    },
+    "eventCreateEventRequest": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "notificationTime": {
+          "type": "string"
+        }
+      }
+    },
+    "eventCreateEventResponse": {
+      "type": "object"
+    },
+    "eventDeleteEventResponse": {
+      "type": "object"
+    },
+    "eventListDayEventsResponse": {
+      "type": "object",
+      "properties": {
+        "eventList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/Event"
+          }
+        }
+      }
+    },
+    "eventListEventResponse": {
+      "type": "object",
+      "properties": {
+        "eventList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/Event"
+          }
+        }
+      }
+    },
+    "eventListMonthEventsResponse": {
+      "type": "object",
+      "properties": {
+        "eventList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/Event"
+          }
+        }
+      }
+    },
+    "eventListWeekEventsResponse": {
+      "type": "object",
+      "properties": {
+        "eventList": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/Event"
+          }
+        }
+      }
+    },
+    "eventUpdateEventRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "notificationTime": {
+          "type": "string"
+        }
+      }
+    },
+    "eventUpdateEventResponse": {
+      "type": "object"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

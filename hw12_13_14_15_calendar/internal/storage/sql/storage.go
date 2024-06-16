@@ -3,6 +3,7 @@ package sqlstorage
 import (
 	"context"
 	"fmt"
+	"time"
 
 	c "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/config"
 	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage/schemas"
@@ -72,6 +73,74 @@ func (s *Storage) Close() error {
 func (s *Storage) ListEvents(ctx context.Context) (events []schemas.Event, err error) {
 	query := "select * from events"
 	rows, err := s.db.QueryxContext(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %w", err)
+	}
+	for rows.Next() {
+		var event schemas.Event
+		if err := rows.StructScan(&event); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		events = append(events, event)
+	}
+	return events, nil
+}
+
+func (s *Storage) ListDayEvents(ctx context.Context, date time.Time) (events []schemas.Event, err error) {
+	// select from events where date day, month and year equal event date day, month and year
+	query := `
+	select * from events
+	where
+	date_part('day', date) = date_part('day', $1::timestamp)
+	and date_part('month', date) = date_part('month', $1::timestamp)
+	and date_part('year', date) = date_part('year', $1::timestamp)
+	`
+	rows, err := s.db.QueryxContext(ctx, query, date)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %w", err)
+	}
+	for rows.Next() {
+		var event schemas.Event
+		if err := rows.StructScan(&event); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		events = append(events, event)
+	}
+	return events, nil
+}
+
+func (s *Storage) ListWeekEvents(ctx context.Context, date time.Time) (events []schemas.Event, err error) {
+	query := `
+	select * from events
+	where
+	date_part('week', date) = date_part('week', $1::timestamp)
+	and date_part('month', date) = date_part('month', $1::timestamp)
+	and date_part('year', date) = date_part('year', $1::timestamp)
+	`
+	rows, err := s.db.QueryxContext(ctx, query, date)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %w", err)
+	}
+	for rows.Next() {
+		var event schemas.Event
+		if err := rows.StructScan(&event); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		events = append(events, event)
+	}
+	return events, nil
+}
+
+func (s *Storage) ListMonthEvents(ctx context.Context, date time.Time) (events []schemas.Event, err error) {
+	query := `
+	select * from events
+	where
+	date_part('month', date) = date_part('month', $1::timestamp)
+	and date_part('year', date) = date_part('year', $1::timestamp)
+	`
+	fmt.Println(query)
+	fmt.Println("date", date)
+	rows, err := s.db.QueryxContext(ctx, query, date)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}

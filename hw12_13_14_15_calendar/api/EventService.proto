@@ -2,22 +2,71 @@ syntax = "proto3";
 
 package event;
 
-import "api/Event.proto";
+// import "api/Event.proto";
+import "Event.proto";
+import "Date.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
+import "google/api/annotations.proto";
 
 option go_package = "internal/pb";
 
 service EventService {
-    rpc List(ListEventRequest) returns(ListEventResponse) {}
-    rpc Create(CreateEventRequest) returns(CreateEventResponse) {}
-    rpc Delete(DeleteEventRequest) returns(DeleteEventResponse) {}
-    rpc Update(UpdateEventRequest) returns(UpdateEventResponse) {}
+    rpc List(ListEventRequest) returns(ListEventResponse) {
+        option (google.api.http) = {
+            get: "/events"
+        };
+    }
+    rpc Create(CreateEventRequest) returns(CreateEventResponse) {
+        option (google.api.http) = {
+            post: "/events"
+            body: "*"
+        };
+    }
+    rpc Delete(DeleteEventRequest) returns(DeleteEventResponse) {
+        option (google.api.http) = {
+            delete: "/events/{id}"
+        };
+    }
+    rpc Update(UpdateEventRequest) returns(UpdateEventResponse) {
+        option (google.api.http) = {
+            patch: "/events"
+            body: "*"
+        };
+    }
+    rpc ListDayEvents(ListDayEventsRequest) returns(ListDayEventsResponse) {}
+    rpc ListWeekEvents(ListWeekEventsRequest) returns(ListWeekEventsResponse) {}
+    rpc ListMonthEvents(ListMonthEventsRequest) returns(ListMonthEventsResponse) {}
 }
 
 message ListEventRequest {}
 
 message ListEventResponse {
+    repeated Event event_list = 1;
+}
+
+message ListDayEventsRequest {
+    Date date = 1;
+}
+
+message ListDayEventsResponse {
+    repeated Event event_list = 1;
+}
+
+message ListWeekEventsRequest {
+    Date date = 1;
+}
+
+message ListWeekEventsResponse {
+    repeated Event event_list = 1;
+}
+
+
+message ListMonthEventsRequest {
+    Month month = 1;
+}
+
+message ListMonthEventsResponse {
     repeated Event event_list = 1;
 }
 

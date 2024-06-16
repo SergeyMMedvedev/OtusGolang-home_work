@@ -14,7 +14,7 @@ import (
 	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/app"
 	c "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/config"
 	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/logger"
-	internalgrpc "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/server/grpc_server"
+	internalgrpc "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/server/grpcserver"
 	internalhttp "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/server/http"
 	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage"
 )
@@ -68,8 +68,11 @@ func main() {
 
 	calendar := app.New(slog.With("service", "calendar"), storage)
 
-	httpServer := internalhttp.NewServer(
-		slog.With("service", "http_server"), calendar, config.HTTPServer,
+	gateway := internalhttp.NewServer(
+		slog.With("service", "http_server"),
+		calendar,
+		config.GRPCGateWay,
+		config.GRPCServer,
 	)
 
 	grpcServer := internalgrpc.NewServer(
@@ -86,20 +89,22 @@ func main() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 		defer cancel()
 
-		if err := httpServer.Stop(ctx); err != nil {
+		if err := gateway.Stop(ctx); err != nil {
 			slog.Error("failed to stop http server: " + err.Error())
 		}
 	}()
 
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
+
 	go func() {
 		defer wg.Done()
-		if err := httpServer.Start(ctx); err != nil {
-			slog.Info("http server: " + err.Error())
+		if err := gateway.Start(ctx); err != nil {
+			slog.Info("gRPC gateway: " + err.Error())
 			cancel()
 		}
 	}()
+
 	go func() {
 		defer grpcServer.Stop()
 		defer wg.Done()

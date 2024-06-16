@@ -2,9 +2,12 @@ package schemas
 
 import (
 	"fmt"
+	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 type Event struct {
@@ -15,6 +18,33 @@ type Event struct {
 	Description      string
 	UserID           string `db:"user_id"`
 	NotificationTime string `db:"notification_time"`
+}
+
+func (e Event) parseToDurationPb(s string) (*durationpb.Duration, error) {
+	if strings.Contains(s, ":") {
+		var hour, min, sec int
+		_, err := fmt.Sscanf(s, "%d:%d:%d", &hour, &min, &sec)
+		if err != nil {
+			slog.Error(fmt.Sprintf("Error parsing duration: %s", err.Error()))
+			return nil, err
+		}
+		duration := time.Duration(hour)*time.Hour + time.Duration(min)*time.Minute + time.Duration(sec)*time.Second
+		return durationpb.New(duration), nil
+	}
+	duration, err := time.ParseDuration(s)
+	if err != nil {
+		slog.Error(fmt.Sprintf("Error parsing duration: %s", err.Error()))
+		return nil, err
+	}
+	return durationpb.New(duration), nil
+}
+
+func (e Event) GetDurationPb() (*durationpb.Duration, error) {
+	return e.parseToDurationPb(e.Duration)
+}
+
+func (e Event) GetNotificationTimePb() (*durationpb.Duration, error) {
+	return e.parseToDurationPb(e.NotificationTime)
 }
 
 func (e Event) String() string {

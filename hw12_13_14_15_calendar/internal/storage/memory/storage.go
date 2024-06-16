@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage/schemas"
 )
@@ -28,6 +29,46 @@ func (s *Storage) ListEvents(_ context.Context) (events []schemas.Event, err err
 		events = append(events, event)
 	}
 
+	return
+}
+
+func (s *Storage) ListDayEvents(_ context.Context, date time.Time) (events []schemas.Event, err error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	for _, event := range s.events {
+		if event.Date.Year() == date.Year() && event.Date.Month() == date.Month() && event.Date.Day() == date.Day() {
+			events = append(events, event)
+		}
+		events = append(events, event)
+	}
+	return
+}
+
+func (s *Storage) ListWeekEvents(_ context.Context, date time.Time) (events []schemas.Event, err error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	for _, event := range s.events {
+		if event.Date.Year() == date.Year() &&
+			event.Date.Month() == date.Month() &&
+			event.Date.Day() < date.Day()+7 &&
+			event.Date.Day() >= date.Day() {
+			events = append(events, event)
+		}
+	}
+	return
+}
+
+func (s *Storage) ListMonthEvents(_ context.Context, date time.Time) (events []schemas.Event, err error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	for _, event := range s.events {
+		if event.Date.Year() == date.Year() && event.Date.Month() == date.Month() {
+			events = append(events, event)
+		}
+	}
 	return
 }
 

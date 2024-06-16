@@ -10,13 +10,13 @@ import (
 // Организация конфига в main принуждает нас сужать API компонентов, использовать
 // при их конструировании только необходимые параметры, а также уменьшает вероятность циклической зависимости.
 type Config struct {
-	Logger     LoggerConf
-	Storage    StorageConf
-	HTTPServer HTTPServerConf
-	GRPCServer GRPCServerConf
+	Logger      LoggerConf
+	Storage     StorageConf
+	GRPCGateWay GRPCGateWayConf
+	GRPCServer  GRPCServerConf
 }
 
-type HTTPServerConf struct {
+type GRPCGateWayConf struct {
 	Host string
 	Port int64
 }
