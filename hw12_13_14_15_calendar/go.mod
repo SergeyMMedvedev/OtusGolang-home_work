@@ -1,6 +1,8 @@
 module github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar
 
-go 1.19
+go 1.21
+
+toolchain go1.22.1
 
 require (
 	github.com/BurntSushi/toml v1.4.0
@@ -28,5 +30,6 @@ require (
 	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240610135401-a8a62080eff3 // indirect
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

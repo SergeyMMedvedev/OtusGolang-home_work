@@ -6,7 +6,7 @@ level = "INFO"
 
     [storage.psql]
     host = "localhost"
-    port = 5434
+    port = 5432
     user = "otus_user"
     password = "otus_password"
     dbname = "calendar"

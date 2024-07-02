@@ -21,7 +21,7 @@ import (
 )
 
 func server(_ context.Context) (pb.EventServiceClient, func()) {
-	buffer := 101024 * 1024
+	buffer := 10 * 1024 * 1024
 	lis := bufconn.Listen(buffer)
 
 	storage, err := s.NewStorage(c.StorageConf{

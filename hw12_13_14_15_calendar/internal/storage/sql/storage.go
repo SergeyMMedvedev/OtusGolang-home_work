@@ -106,6 +106,9 @@ func (s *Storage) ListDayEvents(ctx context.Context, date time.Time) (events []s
 		}
 		events = append(events, event)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to iterate rows: %w", err)
+	}
 	return events, nil
 }
 
