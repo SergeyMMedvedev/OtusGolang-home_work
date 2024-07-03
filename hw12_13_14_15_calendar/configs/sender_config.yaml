@@ -1,0 +1,24 @@
+logger:
+    level: "INFO"
+
+broker:
+  uri: "amqp://guest:guest@localhost:5672/"
+
+exchange:
+  name: "calendar"
+  type: "direct"
+  key: "scheduler"
+  reliable: true
+
+queue:
+  name: "calendar"
+  durable: true
+  auto_delete: false
+  exclusive: false
+  no_wait: false
+    
+binding:
+  queue_name: "calendar"
+  exchange: "calendar"
+  key: "scheduler"
+  no_wait: false
