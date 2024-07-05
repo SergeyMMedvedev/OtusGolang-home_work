@@ -7,5 +7,22 @@ broker:
 exchange:
   name: "calendar"
   type: "direct"
+  durable: true
+  auto_delete: false
+  internal: false
+  no_wait: false
   key: "scheduler"
-  reliable: true
+  reliable: false
+
+storage:
+  type: "psql"
+
+  psql:
+    host: "localhost"
+    port: 5432
+    user: "otus_user"
+    password: "otus_password"
+    dbname: "calendar"
+    sslmode: "disable"
+    migration_dir: "migrations"
+    exec_migration: true

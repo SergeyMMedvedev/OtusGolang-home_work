@@ -32,6 +32,21 @@ func (s *Storage) ListEvents(_ context.Context) (events []schemas.Event, err err
 	return
 }
 
+func (s *Storage) ListEventsForNotification(_ context.Context) (events []schemas.Event, err error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	for _, event := range s.events {
+		t := event.Date.Add(-time.Duration(event.NotificationTime) * time.Hour).Truncate(time.Second)
+		now := time.Now().Truncate(time.Second)
+		if t == now {
+			events = append(events, event)
+		}
+	}
+
+	return
+}
+
 func (s *Storage) ListDayEvents(_ context.Context, date time.Time) (events []schemas.Event, err error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()

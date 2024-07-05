@@ -112,6 +112,29 @@ func (s *Storage) ListDayEvents(ctx context.Context, date time.Time) (events []s
 	return events, nil
 }
 
+func (s *Storage) ListEventsForNotification(ctx context.Context) (events []schemas.Event, err error) {
+	query := `
+	select * from events
+	where
+	DATE_TRUNC('second', current_timestamp) = DATE_TRUNC('second', date) - (notification_time || ' days')::INTERVAL;
+	`
+	rows, err := s.db.QueryxContext(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %w", err)
+	}
+	for rows.Next() {
+		var event schemas.Event
+		if err := rows.StructScan(&event); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		events = append(events, event)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to iterate rows: %w", err)
+	}
+	return events, nil
+}
+
 func (s *Storage) ListWeekEvents(ctx context.Context, date time.Time) (events []schemas.Event, err error) {
 	query := `
 	select * from events

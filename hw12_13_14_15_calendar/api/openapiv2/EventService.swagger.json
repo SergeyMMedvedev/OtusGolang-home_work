@@ -174,7 +174,8 @@
           "type": "string"
         },
         "notificationTime": {
-          "type": "string"
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -213,7 +214,8 @@
           "type": "string"
         },
         "notificationTime": {
-          "type": "string"
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -294,7 +296,8 @@
           "type": "string"
         },
         "notificationTime": {
-          "type": "string"
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

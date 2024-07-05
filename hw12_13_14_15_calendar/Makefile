@@ -39,6 +39,9 @@ generate:
 	--go-grpc_out=. \
 	api/*.proto
 
+buf_generate:
+	buf generate
+
 LOCAL_BIN := $(CURDIR)/bin
 install:
 	GOBIN=$(LOCAL_BIN) go install github.com/bufbuild/buf/cmd/buf@v1.34.0

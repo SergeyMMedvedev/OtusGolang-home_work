@@ -10,6 +10,7 @@ type SchedulerConfig struct {
 	Logger   LoggerConf
 	Broker   BrokerConf
 	Exchange ExchangeConf
+	Storage  StorageConf
 }
 
 func NewSchedulerConfig() *SchedulerConfig {

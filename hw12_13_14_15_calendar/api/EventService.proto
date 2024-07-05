@@ -76,7 +76,7 @@ message CreateEventRequest {
     google.protobuf.Duration duration = 3;
     string description = 4;
     string user_id = 5;
-    google.protobuf.Duration notification_time = 6;
+    int32 notification_time = 6;
 }
 
 message CreateEventResponse {}
@@ -94,7 +94,7 @@ message UpdateEventRequest {
     google.protobuf.Duration duration = 4;
     string description = 5;
     string user_id = 6;
-    google.protobuf.Duration notification_time = 7;
+    int32 notification_time = 7;
 }
 
 message UpdateEventResponse {}

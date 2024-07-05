@@ -12,8 +12,8 @@ import (
 type CalendarConfig struct {
 	Logger      LoggerConf
 	Storage     StorageConf
-	GRPCGateWay GRPCGateWayConf
-	GRPCServer  GRPCServerConf
+	GRPCGateWay GRPCGateWayConf `yaml:"gRPCGateWay"`
+	GRPCServer  GRPCServerConf  `yaml:"gRPCServer"`
 }
 
 type GRPCGateWayConf struct {
@@ -24,22 +24,6 @@ type GRPCGateWayConf struct {
 type GRPCServerConf struct {
 	Host string
 	Port int64
-}
-
-type StorageConf struct {
-	Type string
-	Psql PsqlConf
-}
-
-type PsqlConf struct {
-	Host          string
-	Port          int64
-	User          string
-	Password      string
-	Dbname        string
-	Sslmode       string
-	MigrationDir  string `yaml:"migration_dir"`
-	ExecMigration bool   `yaml:"exec_migration"`
 }
 
 func NewCalendarConfig() CalendarConfig {

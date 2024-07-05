@@ -17,7 +17,7 @@ type Event struct {
 	Duration         string `default:"00:30:00"`
 	Description      string
 	UserID           string `db:"user_id"`
-	NotificationTime string `db:"notification_time"`
+	NotificationTime int32  `db:"notification_time"`
 }
 
 func (e Event) parseToDurationPb(s string) (*durationpb.Duration, error) {
@@ -43,22 +43,17 @@ func (e Event) GetDurationPb() (*durationpb.Duration, error) {
 	return e.parseToDurationPb(e.Duration)
 }
 
-func (e Event) GetNotificationTimePb() (*durationpb.Duration, error) {
-	return e.parseToDurationPb(e.NotificationTime)
-}
-
 func (e Event) String() string {
 	return fmt.Sprintf(
-		"{ID: %s, Title: %s, Date: %s, Duration: %s, Description: %s, UserID: %s, NotificationTime: %s}",
+		"{ID: %s, Title: %s, Date: %s, Duration: %s, Description: %s, UserID: %s, NotificationTime: %v}",
 		e.ID, e.Title, e.Date, e.Duration, e.Description, e.UserID, e.NotificationTime,
 	)
 }
 
 func NewEvent() Event {
-	defaultTime := "00:30:00"
 	newID := uuid.New().String()
 	return Event{
 		ID:               newID,
-		NotificationTime: defaultTime,
+		NotificationTime: 1,
 	}
 }

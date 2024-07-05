@@ -1,0 +1,2 @@
+
+goose -dir migrations postgres "user=otus_user password=otus_password dbname=calendar sslmode=disable" down

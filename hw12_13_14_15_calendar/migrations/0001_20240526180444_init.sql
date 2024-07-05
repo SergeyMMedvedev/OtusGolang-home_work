@@ -8,13 +8,15 @@ CREATE TABLE events (
     duration INTERVAL,
     description TEXT DEFAULT '',
     user_id UUID NOT NULL,
-    notification_time INTERVAL
+    notification_time INT
 );
-CREATE INDEX idx_event_user_id ON event(user_id);
+-- CREATE INDEX idx_event_user_id ON event(user_id);
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-drop index idx_event_user_id;
+-- drop index idx_event_user_id;
 drop table events;
 -- +goose StatementEnd
+
+
