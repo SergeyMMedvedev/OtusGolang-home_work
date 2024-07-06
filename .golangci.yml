@@ -17,6 +17,7 @@ linters-settings:
           - "golang.org" 
           - "google.golang.org"
           - "$gostd"
+          - "gopkg.in"
 
 issues:
   exclude-rules:
