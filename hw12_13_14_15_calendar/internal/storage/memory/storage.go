@@ -37,9 +37,9 @@ func (s *Storage) ListEventsForNotification(_ context.Context) (events []schemas
 	defer s.mu.RUnlock()
 
 	for _, event := range s.events {
-		t := event.Date.Add(-time.Duration(event.NotificationTime) * time.Hour).Truncate(time.Second)
+		t := event.Date.Add(-time.Duration(event.NotificationTime) * time.Hour * 24).Truncate(time.Second)
 		now := time.Now().Truncate(time.Second)
-		if t == now {
+		if t.UTC() == now.UTC() {
 			events = append(events, event)
 		}
 	}
@@ -87,10 +87,20 @@ func (s *Storage) ListMonthEvents(_ context.Context, date time.Time) (events []s
 	return
 }
 
+func (s *Storage) ListLastYearEvents(_ context.Context) (events []schemas.Event, err error) {
+	date := time.Now().AddDate(-1, 0, 0)
+	for _, event := range s.events {
+		if event.Date.Before(date) {
+			events = append(events, event)
+		}
+	}
+	return events, nil
+}
+
 func (s *Storage) CreateEvent(_ context.Context, event schemas.Event) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-
+	fmt.Println("CreateEvent", event)
 	s.events[event.ID] = event
 
 	return nil

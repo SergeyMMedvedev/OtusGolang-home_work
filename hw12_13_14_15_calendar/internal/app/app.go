@@ -21,7 +21,9 @@ type Storage interface {
 	ListDayEvents(ctx context.Context, date time.Time) ([]schemas.Event, error)
 	ListWeekEvents(ctx context.Context, date time.Time) ([]schemas.Event, error)
 	ListMonthEvents(ctx context.Context, date time.Time) ([]schemas.Event, error)
+
 	ListEventsForNotification(ctx context.Context) ([]schemas.Event, error)
+	ListLastYearEvents(ctx context.Context) ([]schemas.Event, error)
 
 	DeleteEvent(ctx context.Context, id string) error
 	UpdateEvent(ctx context.Context, newEvent schemas.Event) error

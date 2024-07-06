@@ -1,74 +1,30 @@
-package grpcserver
+package grpcserver_test
 
 import (
 	"context"
 	"fmt"
-	"log"
-	"log/slog"
-	"net"
 	"testing"
 	"time"
 
-	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/app"
 	c "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/config"
 	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/pb"
 	s "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage"
+	common "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/test/common"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/test/bufconn"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func server(_ context.Context) (pb.EventServiceClient, func()) {
-	buffer := 10 * 1024 * 1024
-	lis := bufconn.Listen(buffer)
-
-	storage, err := s.NewStorage(c.StorageConf{
-		Type: "memory",
-	})
-	if err != nil {
-		log.Printf("error creating storage: %v", err)
-	}
-	baseServer := grpc.NewServer()
-	calendar := app.New(slog.With("service", "calendar"), storage)
-	pb.RegisterEventServiceServer(baseServer, NewServer(
-		slog.With("service", "grpc_server"), calendar, c.GRPCServerConf{
-			Host: "localhost",
-			Port: 50051,
-		},
-	))
-	go func() {
-		if err := baseServer.Serve(lis); err != nil {
-			log.Printf("error serving server: %v", err)
-		}
-	}()
-	conn, err := grpc.NewClient("localhost:50051",
-		grpc.WithContextDialer(func(context.Context, string) (net.Conn, error) {
-			return lis.Dial()
-		}), grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		log.Printf("error connecting to server: %v", err)
-	}
-
-	closer := func() {
-		err := lis.Close()
-		if err != nil {
-			log.Printf("error closing listener: %v", err)
-		}
-		baseServer.Stop()
-	}
-
-	client := pb.NewEventServiceClient(conn)
-
-	return client, closer
+var storageConf = c.StorageConf{
+	Type: "memory",
 }
 
 func TestCreateListUpdateMethod(t *testing.T) {
 	ctx := context.Background()
-
-	client, closer := server(ctx)
+	storage, err := s.NewStorage(storageConf)
+	require.NoError(t, err)
+	err = storage.Connect(context.Background())
+	require.NoError(t, err)
+	client, closer := common.Server(ctx, storage)
 	defer closer()
 
 	out, err := client.Create(ctx, &pb.CreateEventRequest{
@@ -141,8 +97,11 @@ func datesGenerator(dateFrom time.Time, dateTo time.Time) []time.Time {
 
 func TestListMonthEventsMethod(t *testing.T) {
 	ctx := context.Background()
-
-	client, closer := server(ctx)
+	storage, err := s.NewStorage(storageConf)
+	require.NoError(t, err)
+	err = storage.Connect(context.Background())
+	require.NoError(t, err)
+	client, closer := common.Server(ctx, storage)
 	defer closer()
 
 	dates := datesGenerator(
@@ -183,8 +142,11 @@ func TestListMonthEventsMethod(t *testing.T) {
 
 func TestWeekEventsMethod(t *testing.T) {
 	ctx := context.Background()
-
-	client, closer := server(ctx)
+	storage, err := s.NewStorage(storageConf)
+	require.NoError(t, err)
+	err = storage.Connect(context.Background())
+	require.NoError(t, err)
+	client, closer := common.Server(ctx, storage)
 	defer closer()
 
 	dates := datesGenerator(

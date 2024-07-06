@@ -2,8 +2,9 @@ package config
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"os"
+
+	"gopkg.in/yaml.v3"
 )
 
 // При желании конфигурацию можно вынести в internal/config.
@@ -12,8 +13,8 @@ import (
 type CalendarConfig struct {
 	Logger      LoggerConf
 	Storage     StorageConf
-	GRPCGateWay GRPCGateWayConf `yaml:"gRPCGateWay"`
-	GRPCServer  GRPCServerConf  `yaml:"gRPCServer"`
+	GRPCGateWay GRPCGateWayConf `yaml:"gRpcGateWay"`
+	GRPCServer  GRPCServerConf  `yaml:"gRpcServer"`
 }
 
 type GRPCGateWayConf struct {

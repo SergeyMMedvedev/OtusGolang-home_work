@@ -2,15 +2,29 @@ package config
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"os"
+	"time"
+
+	"gopkg.in/yaml.v3"
 )
 
 type SenderConfig struct {
-	Logger  LoggerConf
-	Broker  BrokerConf
-	Queue   QueueConf
-	Binding BindingConf
+	Logger   LoggerConf
+	Broker   BrokerConf
+	Queue    QueueConf
+	Binding  BindingConf
+	Exchange ExchangeConf
+	Consumer ConsumerConf
+}
+
+type ConsumerConf struct {
+	Tag       string
+	Lifetime  time.Duration
+	NoAck     bool
+	Exclusive bool
+	NoLocal   bool
+	NoWait    bool
+	Args      map[string]interface{}
 }
 
 type QueueConf struct {
@@ -19,12 +33,15 @@ type QueueConf struct {
 	AutoDelete bool
 	Exclusive  bool
 	NoWait     bool
+	Key        string
+	Args       map[string]interface{}
 }
 type BindingConf struct {
 	QueueName string
 	Exchange  string
 	Key       string
 	NoWait    bool
+	Args      map[string]interface{}
 }
 
 func NewSenderConfig() *SenderConfig {

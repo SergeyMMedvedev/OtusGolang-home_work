@@ -17,6 +17,7 @@ type ExchangeConf struct {
 	NoWait     bool
 	Key        string
 	Reliable   bool
+	Args       map[string]interface{}
 }
 
 type StorageConf struct {
@@ -31,6 +32,6 @@ type PsqlConf struct {
 	Password      string
 	Dbname        string
 	Sslmode       string
-	MigrationDir  string `yaml:"migration_dir"`
-	ExecMigration bool   `yaml:"exec_migration"`
+	MigrationDir  string
+	ExecMigration bool
 }

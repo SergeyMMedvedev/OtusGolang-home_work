@@ -169,6 +169,7 @@ func (s *Server) Create(ctx context.Context, req *pb.CreateEventRequest) (*pb.Cr
 	if duration == time.Duration(0) {
 		duration = time.Minute * 30
 	}
+
 	event := schemas.Event{
 		Title:            req.GetTitle(),
 		Description:      req.GetDescription(),

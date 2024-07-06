@@ -14,10 +14,10 @@ storage:
         migration_dir: "migrations"
         exec_migration: true
 
-gRPCGateWay:
+gRpcGateWay:
     host: "0.0.0.0"
     port: 50052
 
-gRPCServer: 
+gRpcServer: 
     host: "localhost"
     port: 50051
