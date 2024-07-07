@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"net"
+	"os"
 	"sync"
 	"testing"
 	"time"
@@ -61,5 +62,35 @@ func TestTelnetClient(t *testing.T) {
 		}()
 
 		wg.Wait()
+	})
+}
+
+func TestArgParse(t *testing.T) {
+	t.Run("check parseArgs", func(t *testing.T) {
+		originalArgs := os.Args
+		defer func() { os.Args = originalArgs }()
+		os.Args = []string{"go-telnet", "127.0.0.1", "80"}
+		flags, err := parseArgs()
+		require.NoError(t, err)
+		require.Equal(t, "127.0.0.1:80", flags.address)
+		require.Equal(t, time.Second*10, flags.timeout)
+	})
+
+	t.Run("check parseArgs no host&port", func(t *testing.T) {
+		originalArgs := os.Args
+		defer func() { os.Args = originalArgs }()
+		os.Args = []string{"go-telnet"}
+		_, err := parseArgs()
+		require.Error(t, err)
+		require.Equal(t, "host and port is required", err.Error())
+	})
+
+	t.Run("check parseArgs timeout", func(t *testing.T) {
+		originalArgs := os.Args
+		defer func() { os.Args = originalArgs }()
+		os.Args = []string{"go-telnet", "--timeout=12s", "127.0.0.1", "80"}
+		flags, err := parseArgs()
+		require.NoError(t, err)
+		require.Equal(t, time.Second*12, flags.timeout)
 	})
 }
