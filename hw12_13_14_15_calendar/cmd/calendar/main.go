@@ -7,12 +7,14 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
 	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/app"
 	c "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/config"
 	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/logger"
+	internalgrpc "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/server/grpcserver"
 	internalhttp "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/server/http"
 	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage"
 )
@@ -66,8 +68,15 @@ func main() {
 
 	calendar := app.New(slog.With("service", "calendar"), storage)
 
-	server := internalhttp.NewServer(
-		slog.With("service", "server"), calendar, config.Server,
+	gateway := internalhttp.NewServer(
+		slog.With("service", "http_server"),
+		calendar,
+		config.GRPCGateWay,
+		config.GRPCServer,
+	)
+
+	grpcServer := internalgrpc.NewServer(
+		slog.With("service", "grpc_server"), calendar, config.GRPCServer,
 	)
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
@@ -80,15 +89,31 @@ func main() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 		defer cancel()
 
-		if err := server.Stop(ctx); err != nil {
+		if err := gateway.Stop(ctx); err != nil {
 			slog.Error("failed to stop http server: " + err.Error())
 		}
 	}()
 
-	slog.Info("calendar is running...")
-	if err := server.Start(ctx); err != nil {
-		slog.Error("failed to start http server: " + err.Error())
-		cancel()
-		os.Exit(1) //nolint:gocritic
-	}
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		if err := gateway.Start(ctx); err != nil {
+			slog.Info("gRPC gateway: " + err.Error())
+			cancel()
+		}
+	}()
+
+	go func() {
+		defer grpcServer.Stop()
+		defer wg.Done()
+		if err := grpcServer.Run(ctx); err != nil {
+			slog.Info("grpc server: " + err.Error())
+			cancel()
+		}
+		slog.Info("grpc server: 123")
+	}()
+
+	wg.Wait()
 }

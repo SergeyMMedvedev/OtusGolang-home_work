@@ -15,6 +15,7 @@ linters-settings:
         allow:
           - "github.com"
           - "golang.org" 
+          - "google.golang.org"
           - "$gostd"
 
 issues:

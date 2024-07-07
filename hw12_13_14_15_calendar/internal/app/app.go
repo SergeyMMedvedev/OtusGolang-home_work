@@ -7,6 +7,7 @@ import (
 	"time"
 
 	schemas "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/storage/schemas"
+	"github.com/google/uuid"
 )
 
 type App struct {
@@ -17,6 +18,9 @@ type App struct {
 type Storage interface {
 	CreateEvent(ctx context.Context, event schemas.Event) error
 	ListEvents(ctx context.Context) ([]schemas.Event, error)
+	ListDayEvents(ctx context.Context, date time.Time) ([]schemas.Event, error)
+	ListWeekEvents(ctx context.Context, date time.Time) ([]schemas.Event, error)
+	ListMonthEvents(ctx context.Context, date time.Time) ([]schemas.Event, error)
 	DeleteEvent(ctx context.Context, id string) error
 	UpdateEvent(ctx context.Context, newEvent schemas.Event) error
 }
@@ -30,24 +34,19 @@ func New(log *slog.Logger, storage Storage) *App {
 
 func (a *App) CreateEvent(
 	ctx context.Context,
-	id, title string,
-	date time.Time,
-	duration string,
-	descr string,
-	userID string,
-	notificationTime string,
+	event schemas.Event,
 ) error {
-	a.logger.Info("CreateEvent", "id", id, "title", title)
+	a.logger.Info("CreateEvent", "id", event.ID, "title", event.Title)
 	return a.storage.CreateEvent(
 		ctx,
 		schemas.Event{
-			ID:               id,
-			Title:            title,
-			Date:             date,
-			Duration:         duration,
-			Description:      descr,
-			UserID:           userID,
-			NotificationTime: notificationTime,
+			ID:               uuid.New().String(),
+			Title:            event.Title,
+			Date:             event.Date,
+			Duration:         event.Duration,
+			Description:      event.Description,
+			UserID:           event.UserID,
+			NotificationTime: event.NotificationTime,
 		},
 	)
 }
@@ -57,6 +56,33 @@ func (a *App) ListEvents(ctx context.Context) (events []schemas.Event, err error
 	if err != nil {
 		a.logger.Error("ListEvents", "err", err)
 		return nil, fmt.Errorf("app ListEvents error: %w", err)
+	}
+	return events, nil
+}
+
+func (a *App) ListDayEvents(ctx context.Context, date time.Time) (events []schemas.Event, err error) {
+	events, err = a.storage.ListDayEvents(ctx, date)
+	if err != nil {
+		a.logger.Error("ListDayEvents", "err", err)
+		return nil, fmt.Errorf("app ListDayEvents error: %w", err)
+	}
+	return events, nil
+}
+
+func (a *App) ListWeekEvents(ctx context.Context, date time.Time) (events []schemas.Event, err error) {
+	events, err = a.storage.ListWeekEvents(ctx, date)
+	if err != nil {
+		a.logger.Error("ListWeekEvents", "err", err)
+		return nil, fmt.Errorf("app ListWeekEvents error: %w", err)
+	}
+	return events, nil
+}
+
+func (a *App) ListMonthEvents(ctx context.Context, date time.Time) (events []schemas.Event, err error) {
+	events, err = a.storage.ListMonthEvents(ctx, date)
+	if err != nil {
+		a.logger.Error("ListMonthEvents", "err", err)
+		return nil, fmt.Errorf("app ListMonthEvents error: %w", err)
 	}
 	return events, nil
 }
