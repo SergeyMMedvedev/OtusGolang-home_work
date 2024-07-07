@@ -11,5 +11,5 @@ message Event {
     google.protobuf.Duration duration = 4;
     string description = 5;
     string user_id = 6;
-    google.protobuf.Duration notification_time = 7;
+    int32 notification_time = 7;
 }

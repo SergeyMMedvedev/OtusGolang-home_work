@@ -106,6 +106,34 @@ func (s *Storage) ListDayEvents(ctx context.Context, date time.Time) (events []s
 		}
 		events = append(events, event)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to iterate rows: %w", err)
+	}
+	return events, nil
+}
+
+func (s *Storage) ListEventsForNotification(ctx context.Context) (events []schemas.Event, err error) {
+	query := `
+	select * from events
+	where
+	DATE_TRUNC('second', current_timestamp AT TIME ZONE $1) = 
+	DATE_TRUNC('second', date) - (notification_time || ' days')::INTERVAL;
+	`
+	zoneName, _ := time.Now().Zone()
+	rows, err := s.db.QueryxContext(ctx, query, zoneName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %w", err)
+	}
+	for rows.Next() {
+		var event schemas.Event
+		if err := rows.StructScan(&event); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		events = append(events, event)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to iterate rows: %w", err)
+	}
 	return events, nil
 }
 
@@ -138,9 +166,28 @@ func (s *Storage) ListMonthEvents(ctx context.Context, date time.Time) (events [
 	date_part('month', date) = date_part('month', $1::timestamp)
 	and date_part('year', date) = date_part('year', $1::timestamp)
 	`
-	fmt.Println(query)
-	fmt.Println("date", date)
 	rows, err := s.db.QueryxContext(ctx, query, date)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute query: %w", err)
+	}
+	for rows.Next() {
+		var event schemas.Event
+		if err := rows.StructScan(&event); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		events = append(events, event)
+	}
+	return events, nil
+}
+
+func (s *Storage) ListLastYearEvents(ctx context.Context) (events []schemas.Event, err error) {
+	query := `
+	select * from events
+	where
+	DATE_TRUNC('second', date) < (DATE_TRUNC('second', current_timestamp AT TIME ZONE $1) -(1 || ' years')::INTERVAL);
+	`
+	zoneName, _ := time.Now().Zone()
+	rows, err := s.db.QueryxContext(ctx, query, zoneName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute query: %w", err)
 	}

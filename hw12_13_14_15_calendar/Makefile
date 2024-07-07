@@ -1,4 +1,6 @@
 BIN := "./bin/calendar"
+BIN_SCHEDULER := "./bin/scheduler"
+BIN_SENDER := "./bin/sender"
 DOCKER_IMG="calendar:develop"
 
 GIT_HASH := $(shell git log --format="%h" -n 1)
@@ -6,9 +8,11 @@ LDFLAGS := -X main.release="develop" -X main.buildDate=$(shell date -u +%Y-%m-%d
 
 build:
 	go build -v -o $(BIN) -ldflags "$(LDFLAGS)" ./cmd/calendar
+	go build -v -o $(BIN_SCHEDULER) -ldflags "$(LDFLAGS)" ./cmd/scheduler
+	go build -v -o $(BIN_SENDER) -ldflags "$(LDFLAGS)" ./cmd/sender
 
 run: build
-	$(BIN) -config ./configs/config.toml
+	$(BIN) -config ./configs/calendar_config.yaml
 
 build-img:
 	docker build \
@@ -39,11 +43,14 @@ generate:
 	--go-grpc_out=. \
 	api/*.proto
 
+buf_generate:
+	buf generate
+
 LOCAL_BIN := $(CURDIR)/bin
 install:
-	GOBIN=$(LOCAL_BIN) go install github.com/bufbuild/buf/cmd/buf@latest
-	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-	GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	GOBIN=$(LOCAL_BIN) go install github.com/bufbuild/buf/cmd/buf@v1.34.0
+	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34.2
+	GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.4.0
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
 

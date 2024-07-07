@@ -41,11 +41,6 @@ func prepareEventsList(events []schemas.Event) ([]*pb.Event, error) {
 			slog.Error(fmt.Sprintf("Error parsing duration: %s", err.Error()))
 			return nil, err
 		}
-		notificationTime, err := event.GetNotificationTimePb()
-		if err != nil {
-			slog.Error(fmt.Sprintf("Error parsing notificationTime: %s", err.Error()))
-			return nil, err
-		}
 		eventList = append(eventList, &pb.Event{
 			Id:               event.ID,
 			Title:            event.Title,
@@ -53,7 +48,7 @@ func prepareEventsList(events []schemas.Event) ([]*pb.Event, error) {
 			Duration:         duration,
 			Description:      event.Description,
 			UserId:           event.UserID,
-			NotificationTime: notificationTime,
+			NotificationTime: event.NotificationTime,
 		})
 	}
 	return eventList, nil
@@ -174,17 +169,13 @@ func (s *Server) Create(ctx context.Context, req *pb.CreateEventRequest) (*pb.Cr
 	if duration == time.Duration(0) {
 		duration = time.Minute * 30
 	}
-	notificationTime := req.GetNotificationTime().AsDuration()
-	// default notification time
-	if notificationTime == time.Duration(0) {
-		notificationTime = time.Minute * 15
-	}
+
 	event := schemas.Event{
 		Title:            req.GetTitle(),
 		Description:      req.GetDescription(),
 		Date:             req.GetDate().AsTime(),
 		Duration:         duration.String(),
-		NotificationTime: notificationTime.String(),
+		NotificationTime: req.GetNotificationTime(),
 		UserID:           req.GetUserId(),
 	}
 	err := s.app.CreateEvent(ctx, event)
@@ -211,7 +202,7 @@ func (s *Server) Update(ctx context.Context, req *pb.UpdateEventRequest) (*pb.Up
 		Description:      req.GetDescription(),
 		Date:             req.GetDate().AsTime(),
 		Duration:         req.GetDuration().AsDuration().String(),
-		NotificationTime: req.GetNotificationTime().AsDuration().String(),
+		NotificationTime: req.GetNotificationTime(),
 		UserID:           req.GetUserId(),
 	})
 	if err != nil {
@@ -231,7 +222,7 @@ func (s *Server) Run(_ context.Context) error {
 	s.srv = grpc.NewServer()
 	pb.RegisterEventServiceServer(s.srv, s)
 	reflection.Register(s.srv)
-	s.logger.Info("Server started")
+	s.logger.Info(fmt.Sprintf("Server started on %v:%v", s.config.Host, s.config.Port))
 
 	return s.srv.Serve(lis)
 }

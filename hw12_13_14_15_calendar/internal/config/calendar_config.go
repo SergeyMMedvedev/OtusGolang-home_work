@@ -2,18 +2,19 @@ package config
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/BurntSushi/toml"
+	"gopkg.in/yaml.v3"
 )
 
 // При желании конфигурацию можно вынести в internal/config.
 // Организация конфига в main принуждает нас сужать API компонентов, использовать
 // при их конструировании только необходимые параметры, а также уменьшает вероятность циклической зависимости.
-type Config struct {
+type CalendarConfig struct {
 	Logger      LoggerConf
 	Storage     StorageConf
-	GRPCGateWay GRPCGateWayConf
-	GRPCServer  GRPCServerConf
+	GRPCGateWay GRPCGateWayConf `yaml:"gRpcGateWay"`
+	GRPCServer  GRPCServerConf  `yaml:"gRpcServer"`
 }
 
 type GRPCGateWayConf struct {
@@ -26,37 +27,24 @@ type GRPCServerConf struct {
 	Port int64
 }
 
-type LoggerConf struct {
-	Level string
-	// TODO
+func NewCalendarConfig() CalendarConfig {
+	return CalendarConfig{}
 }
 
-type StorageConf struct {
-	Type string
-	Psql PsqlConf
+func (c *CalendarConfig) Read(fpath string) (err error) {
+	// read yaml file
+	data, err := os.ReadFile(fpath)
+	if err != nil {
+		return err
+	}
+	err = yaml.Unmarshal(data, c)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-type PsqlConf struct {
-	Host          string
-	Port          int64
-	User          string
-	Password      string
-	Dbname        string
-	Sslmode       string
-	MigrationDir  string `toml:"migration_dir"`
-	ExecMigration bool   `toml:"exec_migration"`
-}
-
-func NewConfig() Config {
-	return Config{}
-}
-
-func (c *Config) Read(fpath string) (err error) {
-	_, err = toml.DecodeFile(fpath, &c)
-	return
-}
-
-func (c *Config) String() string {
+func (c *CalendarConfig) String() string {
 	return fmt.Sprintf("%+v", *c)
 }
 

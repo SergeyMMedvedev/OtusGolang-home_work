@@ -78,22 +78,3 @@ func (s *Server) Stop(ctx context.Context) error {
 	s.logger.Info("Stop server...")
 	return s.srv.Shutdown(ctx)
 }
-
-// gRPC GateWay
-// conn, err := grpc.NewClient(
-// 	"0.0.0.0:50051",
-// 	grpc.WithTransportCredentials(insecure.NewCredentials()),
-// )
-// if err != nil {
-// 	slog.Error("failed to create gRPC client: " + err.Error())
-// }
-// gwmux := runtime.NewServeMux()
-// err = pb.RegisterEventServiceHandler(context.Background(), gwmux, conn)
-// if err != nil {
-// 	slog.Error("failed to register gRPC gateway: " + err.Error())
-// }
-// gwServer := &http.Server{
-// 	Addr:              ":50052",
-// 	Handler:           gwmux,
-// 	ReadHeaderTimeout: 30,
-// }

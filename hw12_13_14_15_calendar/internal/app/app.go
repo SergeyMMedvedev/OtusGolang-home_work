@@ -21,6 +21,10 @@ type Storage interface {
 	ListDayEvents(ctx context.Context, date time.Time) ([]schemas.Event, error)
 	ListWeekEvents(ctx context.Context, date time.Time) ([]schemas.Event, error)
 	ListMonthEvents(ctx context.Context, date time.Time) ([]schemas.Event, error)
+
+	ListEventsForNotification(ctx context.Context) ([]schemas.Event, error)
+	ListLastYearEvents(ctx context.Context) ([]schemas.Event, error)
+
 	DeleteEvent(ctx context.Context, id string) error
 	UpdateEvent(ctx context.Context, newEvent schemas.Event) error
 }
@@ -54,7 +58,6 @@ func (a *App) CreateEvent(
 func (a *App) ListEvents(ctx context.Context) (events []schemas.Event, err error) {
 	events, err = a.storage.ListEvents(ctx)
 	if err != nil {
-		a.logger.Error("ListEvents", "err", err)
 		return nil, fmt.Errorf("app ListEvents error: %w", err)
 	}
 	return events, nil
@@ -63,7 +66,6 @@ func (a *App) ListEvents(ctx context.Context) (events []schemas.Event, err error
 func (a *App) ListDayEvents(ctx context.Context, date time.Time) (events []schemas.Event, err error) {
 	events, err = a.storage.ListDayEvents(ctx, date)
 	if err != nil {
-		a.logger.Error("ListDayEvents", "err", err)
 		return nil, fmt.Errorf("app ListDayEvents error: %w", err)
 	}
 	return events, nil
@@ -72,7 +74,6 @@ func (a *App) ListDayEvents(ctx context.Context, date time.Time) (events []schem
 func (a *App) ListWeekEvents(ctx context.Context, date time.Time) (events []schemas.Event, err error) {
 	events, err = a.storage.ListWeekEvents(ctx, date)
 	if err != nil {
-		a.logger.Error("ListWeekEvents", "err", err)
 		return nil, fmt.Errorf("app ListWeekEvents error: %w", err)
 	}
 	return events, nil
@@ -81,7 +82,6 @@ func (a *App) ListWeekEvents(ctx context.Context, date time.Time) (events []sche
 func (a *App) ListMonthEvents(ctx context.Context, date time.Time) (events []schemas.Event, err error) {
 	events, err = a.storage.ListMonthEvents(ctx, date)
 	if err != nil {
-		a.logger.Error("ListMonthEvents", "err", err)
 		return nil, fmt.Errorf("app ListMonthEvents error: %w", err)
 	}
 	return events, nil

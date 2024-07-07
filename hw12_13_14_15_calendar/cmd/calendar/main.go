@@ -37,7 +37,7 @@ func main() {
 		return
 	}
 
-	config := c.NewConfig()
+	config := c.NewCalendarConfig()
 	err := config.Read(configFile)
 	if err != nil {
 		fmt.Printf("failed to read config: %v\n", err)
