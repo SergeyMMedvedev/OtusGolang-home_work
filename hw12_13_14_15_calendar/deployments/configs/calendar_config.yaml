@@ -1,0 +1,23 @@
+logger:
+  level: "INFO"
+
+storage:
+  type: "psql"
+
+  psql:
+    host: "postgres"
+    port: 5432
+    user: "otus_user"
+    password: "otus_password"
+    dbname: "calendar"
+    sslmode: "disable"
+    migrationDir: "/opt/calendar/migrations"
+    execMigration: true
+
+gRpcGateWay:
+  host: "0.0.0.0"
+  port: 50052
+
+gRpcServer:
+  host: "0.0.0.0"
+  port: 50051

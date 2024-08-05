@@ -3,6 +3,7 @@ package consumer
 import (
 	"fmt"
 	"log/slog"
+	"os"
 
 	c "github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/config"
 	"github.com/SergeyMMedvedev/OtusGolang-home_work/hw12_13_14_15_calendar/internal/ringbuffer"
@@ -130,6 +131,8 @@ func (c *Consumer) Shutdown() error {
 }
 
 func handle(deliveries <-chan amqp.Delivery, done chan error, buf *ringbuffer.RingBuffer) {
+	deliveredMsgs := "/tmp/delivered.txt"
+
 	for d := range deliveries {
 		msg := fmt.Sprintf(
 			"got %dB delivery: [%v] %q",
@@ -140,6 +143,15 @@ func handle(deliveries <-chan amqp.Delivery, done chan error, buf *ringbuffer.Ri
 		slog.Info(msg)
 		buf.Enqueue(d.Body)
 		d.Ack(false)
+		file, err := os.OpenFile(deliveredMsgs, os.O_WRONLY|os.O_CREATE, 0o644)
+		if err != nil {
+			slog.Error("open file error:" + err.Error())
+		}
+		_, err = file.WriteString(string(d.Body) + "\n")
+		file.Close()
+		if err != nil {
+			slog.Error("write to file error:" + err.Error())
+		}
 	}
 	slog.Info("handle: deliveries channel closed")
 	done <- nil
