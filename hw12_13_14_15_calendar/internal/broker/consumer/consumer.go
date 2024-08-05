@@ -132,11 +132,7 @@ func (c *Consumer) Shutdown() error {
 
 func handle(deliveries <-chan amqp.Delivery, done chan error, buf *ringbuffer.RingBuffer) {
 	deliveredMsgs := "/tmp/delivered.txt"
-	file, err := os.OpenFile(deliveredMsgs, os.O_WRONLY|os.O_CREATE, 0644)
-	if err != nil {
-		slog.Error("open file error:" + err.Error())
-	}
-	defer file.Close()
+
 	for d := range deliveries {
 		msg := fmt.Sprintf(
 			"got %dB delivery: [%v] %q",
@@ -147,7 +143,12 @@ func handle(deliveries <-chan amqp.Delivery, done chan error, buf *ringbuffer.Ri
 		slog.Info(msg)
 		buf.Enqueue(d.Body)
 		d.Ack(false)
+		file, err := os.OpenFile(deliveredMsgs, os.O_WRONLY|os.O_CREATE, 0644)
+		if err != nil {
+			slog.Error("open file error:" + err.Error())
+		}
 		_, err = file.WriteString(string(d.Body) + "\n")
+		file.Close()
 		if err != nil {
 			slog.Error("write to file error:" + err.Error())
 		}

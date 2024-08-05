@@ -6,7 +6,7 @@ broker:
 
 consumer:
   tag: "consumer-tag"
-  lifetime: 1200s
+  lifetime: 12000s
 
 exchange:
   name: "calendar"

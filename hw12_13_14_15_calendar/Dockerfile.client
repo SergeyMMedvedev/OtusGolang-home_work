@@ -1,0 +1,16 @@
+# Собираем в гошке
+FROM golang:1.22.1 as build
+
+ENV BIN_FILE /opt/sender/sender-app
+ENV CODE_DIR /go/src/
+
+WORKDIR ${CODE_DIR}
+
+# Кэшируем слои с модулями
+COPY go.mod .
+# COPY go.sum .
+RUN go mod tidy
+
+COPY . ${CODE_DIR}
+
+CMD ["go", "test", "-v", "./test/integration/..."]
