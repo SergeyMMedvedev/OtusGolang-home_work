@@ -32,6 +32,6 @@ type PsqlConf struct {
 	Password      string
 	Dbname        string
 	Sslmode       string
-	MigrationDir  string
-	ExecMigration bool
+	MigrationDir  string `yaml:"migration_dir"`
+	ExecMigration bool   `yaml:"exec_migration"`
 }

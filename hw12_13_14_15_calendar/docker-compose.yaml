@@ -1,0 +1,71 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: otus_user
+      POSTGRES_PASSWORD: otus_password
+      POSTGRES_DB: calendar
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U otus_user -d calendar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  calendar:
+    build: 
+      context: ./
+      dockerfile: Dockerfile.calendar
+    container_name: calendar
+    ports:
+      - "50051:50051"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  scheduler:
+    build: 
+      context: ./
+      dockerfile: Dockerfile.scheduler
+    container_name: scheduler
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  sender:
+    build: 
+      context: ./
+      dockerfile: Dockerfile.sender
+    container_name: sender
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmqctl status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  rabbitmq_data:
+  pgdata:

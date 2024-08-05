@@ -1,0 +1,28 @@
+logger:
+    level: "INFO"
+
+broker:
+  uri: "amqp://guest:guest@rabbitmq:5672/"
+
+exchange:
+  name: "calendar"
+  type: "direct"
+  durable: true
+  auto_delete: false
+  internal: false
+  no_wait: false
+  key: "scheduler"
+  reliable: false
+
+storage:
+  type: "psql"
+
+  psql:
+    host: "postgres"
+    port: 5432
+    user: "otus_user"
+    password: "otus_password"
+    dbname: "calendar"
+    sslmode: "disable"
+    migration_dir: "/opt/calendar/migrations"
+    exec_migration: true

@@ -1,0 +1,33 @@
+logger:
+    level: "INFO"
+
+broker:
+  uri: "amqp://guest:guest@rabbitmq:5672/"
+
+consumer:
+  tag: "consumer-tag"
+  lifetime: 1200s
+
+exchange:
+  name: "calendar"
+  type: "direct"
+  durable: true
+  auto_delete: false
+  internal: false
+  no_wait: false
+  key: "scheduler"
+  reliable: false
+
+queue:
+  name: "calendar"
+  durable: true
+  auto_delete: false
+  exclusive: false
+  no_wait: false
+  key: "scheduler"
+    
+binding:
+  queue_name: "calendar"
+  exchange: "calendar"
+  key: "scheduler"
+  no_wait: false
