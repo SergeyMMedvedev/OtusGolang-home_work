@@ -15,6 +15,18 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 )
 
+func Client(_ context.Context) (pb.EventServiceClient, error) {
+	conn, err := grpc.NewClient(
+		"calendar:50051",
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		return nil, err
+	}
+	client := pb.NewEventServiceClient(conn)
+	return client, nil
+}
+
 func Server(_ context.Context, storage s.Storage) (pb.EventServiceClient, func()) {
 	buffer := 10 * 1024 * 1024
 	lis := bufconn.Listen(buffer)

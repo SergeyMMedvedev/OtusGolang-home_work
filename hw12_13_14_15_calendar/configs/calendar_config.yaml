@@ -11,8 +11,10 @@ storage:
         password: "otus_password"
         dbname: "calendar"
         sslmode: "disable"
-        migration_dir: "migrations"
-        exec_migration: true
+        migrationDir: "migrations"
+        execMigration: true
+
+
 
 gRpcGateWay:
     host: "0.0.0.0"

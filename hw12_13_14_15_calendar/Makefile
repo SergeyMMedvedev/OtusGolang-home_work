@@ -54,5 +54,13 @@ install:
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
 	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
 
+up:
+	docker compose up --scale test-client=0
+
+down:
+	docker compose down
+
+integration-tests:
+	integration-test.sh
 
 .PHONY: build run build-img run-img version test lint generate install
