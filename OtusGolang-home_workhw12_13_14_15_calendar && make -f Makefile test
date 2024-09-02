@@ -1,0 +1,285 @@
+[33mcommit 717524b8ca27f28c9296ae7d5e7df90a2098029b[m[33m ([m[1;36mHEAD -> [m[1;32mhw14_calendar[m[33m, [m[1;31morigin/hw14_calendar[m[33m)[m
+Author: SergeyMMedvedev <medvedevsm1989@yandex.ru>
+Date:   Mon Aug 5 18:13:24 2024 +0300
+
+    upd
+
+[33mcommit fa5c87bdd1206b77191782fe48f755759a67b563[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Mon Aug 5 10:57:26 2024 +0300
+
+    upd
+
+[33mcommit 47c43f31703dafa3a91f588da60536893c31aae0[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun Jul 7 17:32:37 2024 +0300
+
+    upd pkgs
+
+[33mcommit 8d6dfce8cf1b7db987157dae30428f923940f14b[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun Jul 7 17:26:18 2024 +0300
+
+    init
+
+[33mcommit 9ba1f5cdef84e9045047388f32bc0fbee3ee51f3[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m
+Merge: 86633a2 8079c8f
+Author: Сергей <medvedevsm1989@yandex.ru>
+Date:   Sun Jul 7 17:19:59 2024 +0300
+
+    Merge pull request #14 from SergeyMMedvedev/hw13_calendar
+    
+    Hw13 calendar
+
+[33mcommit 8079c8ff3ad96e9fb4558385a6a3cd2f72a1cc34[m[33m ([m[1;31morigin/hw13_calendar[m[33m)[m
+Merge: eb54eab 86633a2
+Author: Сергей <medvedevsm1989@yandex.ru>
+Date:   Sun Jul 7 17:18:54 2024 +0300
+
+    Merge branch 'master' into hw13_calendar
+
+[33mcommit 86633a29c8d2bdddf245b7952d4688ae54897789[m
+Merge: 3711aa1 80164b1
+Author: Сергей <medvedevsm1989@yandex.ru>
+Date:   Sun Jul 7 17:18:41 2024 +0300
+
+    Merge pull request #13 from SergeyMMedvedev/hw12_calendar
+    
+    init
+
+[33mcommit 80164b1bb329d87f9a1e33ecda99882493c867c6[m[33m ([m[1;31morigin/hw12_calendar[m[33m)[m
+Merge: ed57280 3711aa1
+Author: Сергей <medvedevsm1989@yandex.ru>
+Date:   Sun Jul 7 17:17:47 2024 +0300
+
+    Merge branch 'master' into hw12_calendar
+
+[33mcommit eb54eab3d55ad1439d98b7475b0c1ab2578ce3e6[m[33m ([m[1;32mhw13_calendar[m[33m)[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun Jun 16 19:37:25 2024 +0300
+
+    upd
+
+[33mcommit 1349c03ae8ab3e4be08be23b2b6891c65cc17e22[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun Jun 16 19:34:03 2024 +0300
+
+    upd
+
+[33mcommit 62e601a9b95e5762677ca2076f3e5240ea63a4c0[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sat Jun 15 18:57:30 2024 +0300
+
+    init
+
+[33mcommit ed572804b2a22dffc3d77e83b0a91319871139bc[m[33m ([m[1;32mhw12_calendar[m[33m)[m
+Author: SergeyMMedvedev <medvedevsm1989@yandex.ru>
+Date:   Thu Jun 13 17:43:17 2024 +0300
+
+    fix comments
+
+[33mcommit 49160ef1ba14a951b98447ad2ea6b846e0119f90[m
+Author: SergeyMMedvedev <medvedevsm1989@yandex.ru>
+Date:   Thu Jun 13 17:40:08 2024 +0300
+
+    fix comments
+
+[33mcommit f7818561b951e38dea166f65567c978c48fbbada[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Tue Jun 4 22:19:27 2024 +0300
+
+    init
+
+[33mcommit 992931d20013434a6481c5a9aecbc46871834a49[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Tue Jun 4 22:10:53 2024 +0300
+
+    init
+
+[33mcommit 15f3650b938a3f3f56d107af901704de4b291227[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Tue Jun 4 22:10:26 2024 +0300
+
+    init
+
+[33mcommit 1a302acd2c7dbf6d4ba5a5b034239d9853e6e9e3[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Tue Jun 4 22:04:09 2024 +0300
+
+    init
+
+[33mcommit e629631df3ffd7009c46194d2e37d722c308c7b6[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Tue Jun 4 21:29:23 2024 +0300
+
+    init
+
+[33mcommit 03deb32483e28a148b4f390c10d4c57e59402fd3[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun Jun 2 19:32:08 2024 +0300
+
+    init
+
+[33mcommit 81218cdfa9ec91ba7b109271f973fc06cbcded77[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun Jun 2 19:22:39 2024 +0300
+
+    init
+
+[33mcommit 3711aa159381a2447bc9d7bec1488cb5cbb8dec1[m
+Merge: a2be5ee 41d4e76
+Author: Сергей <medvedevsm1989@yandex.ru>
+Date:   Sun Jun 2 19:06:30 2024 +0300
+
+    Merge pull request #12 from SergeyMMedvedev/hw11_telnet_client
+    
+    Hw11 telnet client
+
+[33mcommit 695692b890acc2e949c6c215c1c323dbc2b014ce[m[33m ([m[1;31morigin/hw12_13_14_15_calendar[m[33m)[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun Jun 2 19:05:23 2024 +0300
+
+    init
+
+[33mcommit 41d4e760ec13f155639995a45c635d6eedfe7a11[m[33m ([m[1;31morigin/hw11_telnet_client[m[33m, [m[1;32mhw11_telnet_client[m[33m)[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun May 19 14:44:30 2024 +0300
+
+    fix
+
+[33mcommit 175388e608fd3c19eb50a29e857c21fbcc839f38[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun May 19 14:40:40 2024 +0300
+
+    fix
+
+[33mcommit 68a095d151253e44c8b0a316afe27bfe42d77340[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun May 19 14:38:52 2024 +0300
+
+    fix
+
+[33mcommit 198daeeecb51c3f48cc98d8f32acfe5fd0265315[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun May 19 14:30:28 2024 +0300
+
+    fix
+
+[33mcommit c0f847db419dce699d09c610de46f209d026a1a6[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun May 19 14:25:54 2024 +0300
+
+    fix
+
+[33mcommit 91aab22a09557303b7fbe823a92aa8fdb0609a61[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun May 19 14:24:13 2024 +0300
+
+    fix
+
+[33mcommit b50576d96af6be41fb9493783a130f3276290fe2[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun May 19 14:19:38 2024 +0300
+
+    fix
+
+[33mcommit 98df71645f0fb85c432b1cd9a032d628f7ef6532[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun May 19 14:16:31 2024 +0300
+
+    fix
+
+[33mcommit e6ff4dc714fa53a9d39c2aec5534703ec44b2818[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun May 19 14:14:42 2024 +0300
+
+    fix
+
+[33mcommit 1808b1c0d4dbe0e60c891153fbbab2d2f785652f[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun May 19 14:12:35 2024 +0300
+
+    fix
+
+[33mcommit dfdd70e3866e5e8ad957ac19cacd016822ed472a[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun May 19 14:11:15 2024 +0300
+
+    fix
+
+[33mcommit becaeffff67ac98513207c4bfcc9999c0524ba3e[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun May 19 14:00:28 2024 +0300
+
+    fix
+
+[33mcommit c51103dc8968d394f3e571a93924cd2197576c64[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun May 19 13:52:15 2024 +0300
+
+    fix
+
+[33mcommit e4c167f55c110c7e403663ade5ebefc709755b08[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun May 19 00:37:15 2024 +0300
+
+    upd
+
+[33mcommit 11682ecfa19da665f32541f937d91a174a354267[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sun May 19 00:33:23 2024 +0300
+
+    upd
+
+[33mcommit fcf87ee799e3af5b7f501628ee71d8c36ec0dda7[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sat May 18 23:51:11 2024 +0300
+
+    upd
+
+[33mcommit 6985b2ac0fdea40d3df2be834bfe8588f16955f6[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sat May 18 23:48:51 2024 +0300
+
+    upd
+
+[33mcommit dea57aaf4f2b9a415034d99b5785872f9f8303dc[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sat May 18 23:48:32 2024 +0300
+
+    upd
+
+[33mcommit c5e7e4f5885b334758fa8b25fd19a56ec319cd16[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sat May 18 21:34:29 2024 +0300
+
+    123
+
+[33mcommit f4d45c6641a82e567b8ac1e060261bb63aaed6c0[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Sat May 18 21:25:59 2024 +0300
+
+    123
+
+[33mcommit 1a5dc122d1404c3648dc3415ec0e4028a16e2020[m
+Author: SergeyMMedvedev <medvedevsm1989@yandex.ru>
+Date:   Sat May 18 14:32:29 2024 +0300
+
+    dsfs
+
+[33mcommit a066fe95236360a7d48a11e1a711a15c77cc56ec[m
+Author: Sergey Medvedev <medvedevsm1989@yandex.ru>
+Date:   Mon May 13 20:08:11 2024 +0300
+
+    upd
+
+[33mcommit a2be5ee7cc15285f2604b19924fe050442b89bad[m
+Merge: 954abcd f0be646
+Author: Сергей <medvedevsm1989@yandex.ru>
+Date:   Tue May 7 09:10:18 2024 +0300
+
+    Merge pull request #11 from SergeyMMedvedev/hw10_program_optimization
+    
+    Hw10 program optimization
+
+[33mcommit f0be64642344fe2c0e26aab42a4a4ea8b0abbc00[m[33m ([m[1;31morigin/hw10_program_optimi
