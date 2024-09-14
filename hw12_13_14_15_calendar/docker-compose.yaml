@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  postgres-service:
+  postgres:
     image: postgres:latest
     container_name: postgres
     environment:
@@ -18,7 +18,7 @@ services:
       timeout: 5s
       retries: 5
 
-  calendar-service:
+  calendar:
     build: 
       context: ./
       dockerfile: Dockerfile.calendar
@@ -29,7 +29,7 @@ services:
       postgres:
         condition: service_healthy
 
-  scheduler-service:
+  scheduler:
     build: 
       context: ./
       dockerfile: Dockerfile.scheduler
@@ -40,7 +40,7 @@ services:
       rabbitmq:
         condition: service_healthy
 
-  sender-service:
+  sender:
     build: 
       context: ./
       dockerfile: Dockerfile.sender
@@ -51,7 +51,7 @@ services:
     volumes:
       - shared_data:/tmp
 
-  rabbitmq-service:
+  rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:

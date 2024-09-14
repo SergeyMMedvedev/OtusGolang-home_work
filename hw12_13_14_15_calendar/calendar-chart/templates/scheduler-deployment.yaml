@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-scheduler-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-scheduler
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-scheduler
+    spec:
+      initContainers:
+        - name: wait-for-rabbitmq
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              {{ .Values.rabbitMQ.initContainers }},
+            ]
+      containers:
+        - name: scheduler
+          image: {{ .Values.scheduler.image }}
+          imagePullPolicy: IfNotPresent
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", {{ .Values.postgres.probeCommand }}]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", {{ .Values.postgres.probeCommand }}]
+            initialDelaySeconds: 30
+            periodSeconds: 10

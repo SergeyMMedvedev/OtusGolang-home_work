@@ -1,0 +1,36 @@
+
+calendar:
+  replicas: 1
+  image: calendar-app:latest
+  port: 50051
+
+postgres:
+  port: 5432
+  user: "otus_user"
+  password: "otus_password"
+  db: "calendar"
+  volume: postgres-storage
+  mountPath: /var/lib/postgresql/data
+  claimName: postgres-pvc
+  storage: 1Gi
+  path: /mnt/data/postgres
+  probeCommand: "nc -z postgres-service 5432"
+
+rabbitMQ:
+  port: 5672
+  webPort: 15672
+  user: "guest"
+  password: "guest"
+  volumeName: rabbitmq-storage
+  volumePath: /var/lib/rabbitmq
+  claimName: rabbitmq-pvc
+  image: rabbitmq:3-management
+  storage: 1Gi
+  initContainers: "until nc -z rabbitmq-service 5672; do echo waiting for rabbitmq; sleep 2; done;"
+
+scheduler:
+  image: scheduler-app:latest
+  initContainers: "until nc -z rabbitmq-service 5672; do echo waiting for rabbitmq; sleep 2; done;"
+
+sender:
+  image: sender-app:latest

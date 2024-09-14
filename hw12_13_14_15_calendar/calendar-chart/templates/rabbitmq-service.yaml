@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-service
+spec:
+  selector:
+    app: {{ .Release.Name }}-rabbitmq
+  ports:
+    - port: {{ .Values.rabbitMQ.port }}
+      targetPort: {{ .Values.rabbitMQ.port }}
+      protocol: TCP
+      name: rabbitmq
+    - port: {{ .Values.rabbitMQ.webPort }}
+      targetPort: {{ .Values.rabbitMQ.webPort }}
+      protocol: TCP
+      name: rabbitmq-management
+  type: NodePort

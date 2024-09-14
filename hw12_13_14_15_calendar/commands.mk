@@ -15,6 +15,18 @@ run-scheduler:
 run-sender:
 	go run ./cmd/sender/*.go --config=./configs/sender_config.yaml
 
-connect-to-grpc-server:
-	grpcui -plaintext localhost:50051
 
+helm-install:
+	helm install my-helm-release -n default calendar-chart -f calendar-chart/values.yaml
+
+helm-uninstall:
+	helm uninstall my-helm-release -n default
+
+minikube-enable-ingress:
+	minikube addons enable ingress
+
+minikube-tunnel:
+	minikube tunnel
+
+connect-to-grpc-server:
+	grpcui -plaintext calendar.local:80

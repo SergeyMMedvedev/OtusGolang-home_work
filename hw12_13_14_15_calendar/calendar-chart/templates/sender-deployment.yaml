@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-sender-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-sender
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-sender
+    spec:
+      initContainers:
+        - name: wait-for-rabbitmq
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              {{ .Values.rabbitMQ.initContainers }},
+            ]
+      containers:
+        - name: sender
+          image: {{ .Values.sender.image }}
+          imagePullPolicy: IfNotPresent
