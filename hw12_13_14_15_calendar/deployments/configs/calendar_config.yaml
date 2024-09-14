@@ -5,7 +5,7 @@ storage:
   type: "psql"
 
   psql:
-    host: "postgres"
+    host: "postgres-service"
     port: 5432
     user: "otus_user"
     password: "otus_password"

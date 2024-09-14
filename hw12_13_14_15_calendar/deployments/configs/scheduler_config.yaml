@@ -2,7 +2,7 @@ logger:
     level: "INFO"
 
 broker:
-  uri: "amqp://guest:guest@rabbitmq:5672/"
+  uri: "amqp://guest:guest@rabbitmq-service:5672/"
 
 exchange:
   name: "calendar"
@@ -18,7 +18,7 @@ storage:
   type: "psql"
 
   psql:
-    host: "postgres"
+    host: "postgres-service"
     port: 5432
     user: "otus_user"
     password: "otus_password"

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sender-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sender
+  template:
+    metadata:
+      labels:
+        app: sender
+    spec:
+      initContainers:
+        - name: wait-for-rabbitmq
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              "until nc -z rabbitmq-service 5672; do echo waiting for rabbitmq; sleep 2; done;",
+            ]
+      containers:
+        - name: sender
+          image: sender-app:latest
+          imagePullPolicy: IfNotPresent
