@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calendar-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: calendar
+  template:
+    metadata:
+      labels:
+        app: calendar
+    spec:
+      containers:
+        - name: calendar
+          image: calendar-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 50051
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "nc -z postgres-service 5432"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", "nc -z postgres-service 5432"]
+            initialDelaySeconds: 30
+            periodSeconds: 10

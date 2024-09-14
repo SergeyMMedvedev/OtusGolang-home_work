@@ -132,7 +132,7 @@ func (c *Consumer) Shutdown() error {
 
 func handle(deliveries <-chan amqp.Delivery, done chan error, buf *ringbuffer.RingBuffer) {
 	deliveredMsgs := "/tmp/delivered.txt"
-
+	slog.Info("start handle")
 	for d := range deliveries {
 		msg := fmt.Sprintf(
 			"got %dB delivery: [%v] %q",

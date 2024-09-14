@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-rabbitmq-deployment
+  labels:
+    app: {{ .Release.Name }}-rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-rabbitmq
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: {{ .Values.rabbitMQ.image }}
+          ports:
+            - containerPort: {{ .Values.rabbitMQ.port }}
+            - containerPort: {{ .Values.rabbitMQ.webPort }}
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: {{ .Values.rabbitMQ.user }}
+            - name: RABBITMQ_DEFAULT_PASS
+              value: {{ .Values.rabbitMQ.password }}
+          volumeMounts:
+            - name: {{ .Values.rabbitMQ.volumeName }}
+              mountPath: {{ .Values.rabbitMQ.volumePath }}
+          livenessProbe:
+            exec:
+              command: ["rabbitmqctl", "status"]
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 10
+            timeoutSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["rabbitmqctl", "status"]
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 10
+            timeoutSeconds: 10
+      volumes:
+        - name: {{ .Values.rabbitMQ.volumeName }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.rabbitMQ.claimName }}

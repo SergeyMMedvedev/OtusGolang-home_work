@@ -2,7 +2,7 @@ logger:
     level: "INFO"
 
 broker:
-  uri: "amqp://guest:guest@rabbitmq:5672/"
+  uri: "amqp://guest:guest@rabbitmq-service:5672/"
 
 consumer:
   tag: "consumer-tag"

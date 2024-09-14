@@ -63,4 +63,25 @@ down:
 integration-tests:
 	integration-test.sh
 
+minikube-start:
+	minikube start
+
+helm-install:
+	helm install my-helm-release -n default calendar-chart -f calendar-chart/values.yaml
+
+helm-uninstall:
+	helm uninstall my-helm-release -n default
+
+minikube-enable-ingress:
+	minikube addons enable ingress
+
+minikube-tunnel:
+	minikube tunnel
+
+minikube-stop:
+	minikube stop
+
+connect-to-grpc-server:
+	grpcui -plaintext calendar.local:80
+
 .PHONY: build run build-img run-img version test lint generate install

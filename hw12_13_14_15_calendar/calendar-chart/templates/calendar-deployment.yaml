@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-calendar-deployment
+spec:
+  replicas: {{ .Values.calendar.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-calendar
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-calendar
+    spec:
+      containers:
+        - name: calendar
+          image: {{ .Values.calendar.image }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .Values.calendar.port }}
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", {{ .Values.postgres.probeCommand }}]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", {{ .Values.postgres.probeCommand }}]
+            initialDelaySeconds: 30
+            periodSeconds: 10
